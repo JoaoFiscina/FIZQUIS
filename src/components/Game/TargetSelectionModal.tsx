@@ -51,17 +51,17 @@ export const TargetSelectionModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl glass-premium p-6 border border-indigo-500/20 text-center space-y-6 shadow-2xl animate-scale-up">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-3xl bg-white p-6 border border-slate-100 text-center space-y-6 shadow-2xl animate-scale-up">
         {/* Ícone Animado */}
-        <div className="mx-auto w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+        <div className="mx-auto w-16 h-16 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
           <Icon size={28} className="animate-pulse" />
         </div>
 
         {/* Título e Descrição */}
         <div className="space-y-2">
-          <h2 className="text-xl font-black text-white tracking-wide">{title}</h2>
-          <p className="text-sm text-gray-400 leading-relaxed px-4">{description}</p>
+          <h2 className="text-xl font-black text-slate-800 tracking-wide">{title}</h2>
+          <p className="text-sm text-slate-500 font-semibold leading-relaxed px-4">{description}</p>
         </div>
 
         {/* Candidatos a Alvo */}
@@ -71,7 +71,7 @@ export const TargetSelectionModal: React.FC = () => {
               <button
                 key={t.id}
                 onClick={() => handleSelect(t.id)}
-                className="w-full p-4 rounded-xl border text-left flex items-center justify-between hover:bg-white/5 transition-all cursor-pointer font-bold"
+                className="w-full p-4 rounded-xl border text-left flex items-center justify-between hover:bg-slate-50 transition-all cursor-pointer font-bold shadow-sm"
                 style={{ borderColor: `${t.color}30`, backgroundColor: `${t.color}05` }}
               >
                 <div className="flex items-center gap-3">
@@ -79,19 +79,19 @@ export const TargetSelectionModal: React.FC = () => {
                     className="w-4 h-4 rounded-full border border-white/20"
                     style={{ backgroundColor: t.color }}
                   />
-                  <span className="text-white text-base">{t.name}</span>
+                  <span className="text-slate-800 text-base">{t.name}</span>
                 </div>
-                <span className="text-xs text-gray-400 font-medium bg-white/5 px-2 py-0.5 rounded">
+                <span className="text-xs text-slate-550 font-extrabold bg-slate-100 px-2 py-0.5 rounded">
                   Casa {t.position}
                 </span>
               </button>
             ))
           ) : (
-            <div className="p-4 text-sm text-gray-500 bg-white/5 rounded-xl border border-white/5 font-semibold">
+            <div className="p-4 text-sm text-slate-500 bg-slate-50 rounded-xl border border-slate-100 font-semibold">
               Nenhuma equipe elegível encontrada! Passando a vez...
               <button
                 onClick={() => handleSelect("")}
-                className="mt-3 block w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer"
+                className="mt-3 block w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-md shadow-indigo-100/50"
               >
                 Continuar
               </button>

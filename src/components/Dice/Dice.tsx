@@ -26,7 +26,7 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
 
   // Renderiza as bolinhas do dado com base no valor
   const renderDots = (val: number) => {
-    const dotClasses = "w-3.5 h-3.5 rounded-full bg-white shadow-inner";
+    const dotClasses = "w-3 h-3 rounded-full bg-indigo-600 shadow-sm";
     
     // Mapeamento de posições para cada valor do dado
     switch (val) {
@@ -38,14 +38,14 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
         );
       case 2:
         return (
-          <div className="flex justify-between w-full h-full p-2.5">
+          <div className="flex justify-between w-full h-full p-3.5">
             <div className={`${dotClasses} self-start`} />
             <div className={`${dotClasses} self-end`} />
           </div>
         );
       case 3:
         return (
-          <div className="flex justify-between w-full h-full p-2.5">
+          <div className="flex justify-between w-full h-full p-3.5">
             <div className={`${dotClasses} self-start`} />
             <div className={`${dotClasses} self-center`} />
             <div className={`${dotClasses} self-end`} />
@@ -53,7 +53,7 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
         );
       case 4:
         return (
-          <div className="grid grid-cols-2 gap-4 w-full h-full p-2.5">
+          <div className="grid grid-cols-2 gap-4 w-full h-full p-3.5">
             <div className={dotClasses} />
             <div className={dotClasses} />
             <div className={dotClasses} />
@@ -62,7 +62,7 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
         );
       case 5:
         return (
-          <div className="relative w-full h-full p-2.5">
+          <div className="relative w-full h-full p-3.5">
             <div className="grid grid-cols-2 gap-4 w-full h-full">
               <div className={dotClasses} />
               <div className={dotClasses} />
@@ -76,7 +76,7 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
         );
       case 6:
         return (
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 w-full h-full p-2.5">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 w-full h-full p-3.5">
             <div className={dotClasses} />
             <div className={dotClasses} />
             <div className={dotClasses} />
@@ -94,13 +94,13 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
     <div className="flex flex-col items-center gap-4">
       {/* O Dado físico */}
       <div
-        className={`w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-indigo-400/50 shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-transform duration-300 ${
+        className={`w-20 h-20 rounded-3xl bg-gradient-to-br from-white to-slate-50 flex items-center justify-center border-4 border-slate-200 shadow-md transition-transform duration-300 ${
           isRolling ? "animate-roll" : "hover:scale-105 active:scale-95"
         }`}
         style={{
           boxShadow: isRolling 
-            ? "0 0 25px rgba(168, 85, 247, 0.7)" 
-            : "0 0 15px rgba(99, 102, 241, 0.4)"
+            ? "0 10px 25px rgba(168, 85, 247, 0.25)" 
+            : "0 4px 12px rgba(0, 0, 0, 0.08)"
         }}
       >
         <div className="w-full h-full relative select-none">
@@ -114,11 +114,11 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
         disabled={disabled || isRolling}
         className={`px-6 py-3 rounded-xl font-bold tracking-wider text-sm transition-all duration-300 transform active:scale-95 uppercase ${
           disabled || isRolling
-            ? "bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed"
-            : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-500 hover:to-purple-500 border border-indigo-500/30 hover:shadow-[0_0_20px_rgba(99,102,241,0.6)] cursor-pointer"
+            ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"
+            : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:opacity-95 shadow-md shadow-indigo-100/50 hover:shadow-indigo-200/50 cursor-pointer"
         }`}
       >
-        {isRolling ? "Sorteando..." : "Começar Plantão (Rolar)"}
+        {isRolling ? "Sorteando..." : "Rolar Dado"}
       </button>
     </div>
   );

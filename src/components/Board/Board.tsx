@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useGameStore } from "../../store/gameStore";
 import { areaColors } from "../../data/board";
 import { PawnIcon } from "./PawnIcon";
@@ -17,8 +17,7 @@ import {
   UserX,
   Stethoscope,
   Scissors,
-  Activity,
-  HeartPulse
+  Activity
 } from "lucide-react";
 import type { SpecialEffectType } from "../../types/game";
 
@@ -35,7 +34,7 @@ const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
     case "alta_hospitalar":
       return <CheckCircle size={size} className="text-white" />;
     case "dupla_checagem":
-      return <HeartPulse size={size} className="text-white" />;
+      return <Zap size={size} className="text-white" />; // Reaproveitando Zap ou similar
     case "plantao_caotico":
       return <AlertTriangle size={size} className="text-white" />;
     case "caso_grave":
@@ -54,37 +53,37 @@ const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
       return <CornerDownLeft size={size} className="text-white" />;
     default:
       // Se for casa normal sem efeito, pode mostrar estetoscópio ou cirurgia dependendo da área
-      if (area === "clinica") return <Stethoscope size={13} className="opacity-80 text-white" />;
-      if (area === "cirurgia") return <Scissors size={13} className="opacity-80 text-white" />;
-      if (area === "urgencia") return <Activity size={13} className="opacity-80 text-white" />;
+      if (area === "clinica") return <Stethoscope size={13} className="opacity-90 text-white" />;
+      if (area === "cirurgia") return <Scissors size={13} className="opacity-90 text-white" />;
+      if (area === "urgencia") return <Activity size={13} className="opacity-90 text-white" />;
+      if (area === "preventiva") return <ShieldAlert size={13} className="opacity-90 text-slate-800" />;
       return null;
   }
 };
 
 export const Board: React.FC = () => {
   const { board, teams, currentTeamIndex, phase } = useGameStore();
-  const boardRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
 
-  // Centraliza o peão ativo em dispositivos móveis
+  // Calcula escala responsiva para caber todo o tabuleiro de 1200x900
   useEffect(() => {
-    if (teams.length === 0 || !boardRef.current) return;
-    const activeTeam = teams[currentTeamIndex];
-    const activeCell = board.find(c => c.id === activeTeam.position);
-    if (!activeCell) return;
+    const handleResize = () => {
+      if (!containerRef.current) return;
+      const containerW = containerRef.current.clientWidth;
+      const containerH = containerRef.current.clientHeight;
+      const scaleX = containerW / 1200;
+      const scaleY = containerH / 900;
+      // Usamos a menor escala para garantir que o tabuleiro caiba inteiro sem scroll
+      setScale(Math.min(scaleX, scaleY));
+    };
 
-    // Calcular scroll
-    const container = boardRef.current;
-    const xPos = (activeCell.position.x / 100) * 1200; // Resolução base do SVG é 1200
-    const yPos = (activeCell.position.y / 100) * 900;  // Altura base é 900
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-    container.scrollTo({
-      left: xPos - container.clientWidth / 2,
-      top: yPos - container.clientHeight / 2,
-      behavior: "smooth"
-    });
-  }, [currentTeamIndex, teams, board]);
-
-  // Renderiza as conexões (caminhos) entre as casas
+  // Renderiza as conexões como uma "estrada" larga e contínua
   const renderPathLines = () => {
     const lines: React.ReactNode[] = [];
     
@@ -103,44 +102,47 @@ export const Board: React.FC = () => {
         const isShortcut = cell.pathGroup === "shortcut" || targetCell.pathGroup === "shortcut";
         const isLong = cell.pathGroup === "long" || targetCell.pathGroup === "long";
         
-        let strokeColor = "rgba(99, 102, 241, 0.4)"; // Padrão Indigo suave
-        let strokeDash = undefined;
+        let roadColor = "#E2E8F0"; // Pista cinza padrão
 
         if (isShortcut) {
-          strokeColor = "rgba(6, 182, 212, 0.6)"; // Cyan para atalhos
-          strokeDash = "4 4";
+          roadColor = "#CFFAFE"; // Azul ciano claro para atalhos
         } else if (isLong) {
-          strokeColor = "rgba(107, 114, 128, 0.4)"; // Cinza para rotas mais longas
-        }
-
-        // Se for a conexão de salto da alta hospitalar (206 -> 23)
-        if (cell.id === 206 && targetCell.id === 207) {
-          // Normal line
+          roadColor = "#E0F2FE"; // Azul muito claro para rotas mais longas
         }
 
         lines.push(
           <g key={`path-${cell.id}-${targetCell.id}`}>
-            {/* Brilho neon de fundo */}
+            {/* Sombra da estrada */}
             <line
               x1={x1}
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke={strokeColor}
-              strokeWidth={8}
+              stroke="rgba(0, 0, 0, 0.04)"
+              strokeWidth={32}
               strokeLinecap="round"
-              className="opacity-20 blur-[2px]"
             />
-            {/* Linha principal */}
+            {/* Corpo da pista */}
             <line
               x1={x1}
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke={strokeColor}
-              strokeWidth={3}
+              stroke={roadColor}
+              strokeWidth={24}
               strokeLinecap="round"
-              strokeDasharray={strokeDash}
+            />
+            {/* Linha tracejada central lúdica */}
+            <line
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="#FFFFFF"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeDasharray="6 6"
+              className="opacity-70"
             />
           </g>
         );
@@ -156,7 +158,6 @@ export const Board: React.FC = () => {
     const activeTeam = teams[currentTeamIndex];
     const isPathChoice = phase === "choosing_path" && activeTeam;
     
-    // Identifica quais casas são opções de bifurcação válidas para o time ativo
     const activeCell = activeTeam ? board.find((c) => c.id === activeTeam.position) : null;
     const selectableCellIds = activeCell?.next && activeCell.next.length > 1 ? activeCell.next : [];
 
@@ -173,8 +174,6 @@ export const Board: React.FC = () => {
       if (isFinal) color = areaColors.final;
       else if (cell.specialEffect) color = areaColors.special;
       else if (cell.area) color = areaColors[cell.area];
-
-      const isSpecial = !!cell.specialEffect;
 
       return (
         <g 
@@ -199,35 +198,33 @@ export const Board: React.FC = () => {
             />
           )}
 
-          {/* Brilho da casa ativa caso tenha equipe nela */}
+          {/* Sombra suave de profundidade */}
           <circle
             cx={x}
-            cy={y}
-            r={isStart || isFinal ? 34 : 26}
-            fill={isSelectable ? "#ec4899" : color}
-            className={`opacity-15 blur-[4px] group-hover:opacity-30 transition-all duration-300 ${
-              isSelectable ? "animate-pulse" : ""
-            }`}
+            cy={y + 2}
+            r={isStart || isFinal ? 28 : 22}
+            fill="rgba(0, 0, 0, 0.15)"
+            className="pointer-events-none"
           />
 
-          {/* Círculo Principal */}
+          {/* Círculo Principal colorido */}
           <circle
             cx={x}
             cy={y}
             r={isStart || isFinal ? 28 : 22}
-            fill="#111827"
-            stroke={isSelectable ? "#ec4899" : color}
-            strokeWidth={isSelectable ? 4 : (isSpecial ? 4 : 2.5)}
-            className="group-hover:stroke-white transition-all duration-300"
+            fill={isSelectable ? "#ec4899" : color}
+            stroke="#FFFFFF"
+            strokeWidth={3}
+            className="group-hover:brightness-105 transition-all duration-300"
           />
 
-          {/* Destaque interno em degradê */}
+          {/* Brilho interno em degradê sutil */}
           <circle
             cx={x}
             cy={y}
-            r={isStart || isFinal ? 25 : 19}
-            fill={isSelectable ? "#ec4899" : color}
-            className="opacity-10 group-hover:opacity-20 transition-all duration-300"
+            r={isStart || isFinal ? 24 : 18}
+            fill="#FFFFFF"
+            className="opacity-15 pointer-events-none"
           />
 
           {/* Ícone ou ID da casa */}
@@ -244,8 +241,8 @@ export const Board: React.FC = () => {
                 x={0}
                 y={4}
                 textAnchor="middle"
-                fill="#9ca3af"
-                className="text-[10px] font-bold select-none group-hover:fill-white transition-colors duration-300"
+                fill={cell.area === "preventiva" ? "#1e293b" : "#ffffff"}
+                className="text-[10px] font-black select-none transition-colors duration-300"
               >
                 {cell.id}
               </text>
@@ -272,10 +269,9 @@ export const Board: React.FC = () => {
     });
   };
 
-  // Renderiza os peões sobre as casas, resolvendo colisões
+  // Renderiza os peões sobre as casas, simulando peças físicas 3D
   const renderPawns = () => {
     return board.map((cell) => {
-      // Filtrar times nesta casa
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
       if (teamsOnCell.length === 0) return null;
 
@@ -289,7 +285,6 @@ export const Board: React.FC = () => {
             const activeTeam = teams[currentTeamIndex];
             const isActive = team.id === activeTeam.id && phase !== "game_over";
 
-            // Calcula offset dos peões na mesma casa
             let px = cx;
             let py = cy;
             
@@ -306,7 +301,8 @@ export const Board: React.FC = () => {
                 className="transition-all duration-500 ease-out"
                 style={{
                   transform: `translate(${px}px, ${py}px)`,
-                  transformOrigin: `${px}px ${py}px`
+                  transformOrigin: `${px}px ${py}px`,
+                  filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))"
                 }}
               >
                 {/* Anelação de pulso para a equipe da vez */}
@@ -317,25 +313,32 @@ export const Board: React.FC = () => {
                     r={20}
                     fill="none"
                     stroke={team.color}
-                    strokeWidth={1.5}
+                    strokeWidth={2}
                     className="animate-pulse-ring"
                   />
                 )}
 
-                {/* Fundo do Peão */}
+                {/* Base do Peão */}
                 <circle
                   cx={0}
                   cy={0}
-                  r={14}
+                  r={15}
                   fill={team.color}
-                  className="shadow-lg stroke-black stroke-2"
-                  style={{
-                    filter: `drop-shadow(0 0 6px ${team.color}80)`
-                  }}
+                  stroke="#FFFFFF"
+                  strokeWidth={2.5}
+                />
+
+                {/* Brilho 3D na peça física */}
+                <circle
+                  cx={-4}
+                  cy={-4}
+                  r={4}
+                  fill="#FFFFFF"
+                  className="opacity-30"
                 />
 
                 {/* Ícone do Peão */}
-                <g transform="translate(-8, -8)" className="text-black">
+                <g transform="translate(-8, -8)" className="text-white">
                   <PawnIcon type={team.pawn} size={16} />
                 </g>
 
@@ -350,35 +353,41 @@ export const Board: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-[450px] md:h-[600px] rounded-2xl glass-premium overflow-hidden border border-indigo-500/20">
-      {/* Grid de fundo */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+    <div 
+      ref={containerRef}
+      className="relative w-full h-[450px] md:h-[600px] rounded-3xl bg-white border border-slate-100 overflow-hidden flex items-center justify-center shadow-sm"
+    >
+      {/* Grid de fundo lúdico */}
+      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-60" />
 
-      {/* Container de scroll para arrastar tabuleiro */}
+      {/* Container escalado responsivamente */}
       <div
-        ref={boardRef}
-        className="w-full h-full overflow-auto cursor-grab active:cursor-grabbing scrollbar-thin scrollbar-track-gray-900 scrollbar-thumb-gray-800"
+        style={{
+          width: "1200px",
+          height: "900px",
+          transform: `scale(${scale})`,
+          transformOrigin: "center center",
+          flexShrink: 0
+        }}
+        className="relative select-none transition-transform duration-300 ease-out"
       >
-        <div className="relative min-w-[1200px] min-h-[900px] mx-auto p-8">
-          <svg
-            viewBox="0 0 1200 900"
-            className="w-full h-full select-none"
-            style={{ minWidth: "1200px", minHeight: "900px" }}
-          >
-            {/* 1. Conexões */}
-            {renderPathLines()}
+        <svg
+          viewBox="0 0 1200 900"
+          className="w-full h-full"
+        >
+          {/* 1. Conexões (Estrada) */}
+          {renderPathLines()}
 
-            {/* 2. Casas do tabuleiro */}
-            {renderCells()}
+          {/* 2. Casas do tabuleiro */}
+          {renderCells()}
 
-            {/* 3. Peões */}
-            {renderPawns()}
-          </svg>
-        </div>
+          {/* 3. Peões */}
+          {renderPawns()}
+        </svg>
       </div>
 
       {/* Indicador de Legenda de Áreas */}
-      <div className="absolute bottom-4 left-4 right-4 md:right-auto glass p-3 rounded-xl flex flex-wrap gap-2 text-xs border border-white/5 pointer-events-none">
+      <div className="absolute bottom-4 left-4 right-4 md:right-auto bg-white/90 backdrop-blur-sm p-3 rounded-2xl flex flex-wrap gap-2 text-xs border border-slate-200 pointer-events-none shadow-sm">
         {Object.entries(areaColors).map(([area, color]) => {
           if (["special", "start", "final"].includes(area)) return null;
           
@@ -394,10 +403,10 @@ export const Board: React.FC = () => {
           return (
             <div key={area} className="flex items-center gap-1.5">
               <span
-                className="w-3 h-3 rounded-full border border-white/10"
+                className="w-3 h-3 rounded-full border border-slate-350"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-gray-300 font-medium">{name}</span>
+              <span className="text-slate-600 font-bold">{name}</span>
             </div>
           );
         })}

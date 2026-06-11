@@ -9,50 +9,50 @@ export const GameLog: React.FC = () => {
     switch (type) {
       case "roll":
         return {
-          icon: <Dice5 size={14} className="text-blue-400" />,
-          bgColor: "bg-blue-500/10 border-blue-500/15 text-blue-300"
+          icon: <Dice5 size={14} className="text-blue-600" />,
+          bgColor: "bg-blue-50 border-blue-100 text-blue-800"
         };
       case "correct":
         return {
-          icon: <CheckCircle size={14} className="text-green-400" />,
-          bgColor: "bg-green-500/10 border-green-500/15 text-green-300"
+          icon: <CheckCircle size={14} className="text-green-600" />,
+          bgColor: "bg-green-50 border-green-100 text-green-800"
         };
       case "wrong":
         return {
-          icon: <XCircle size={14} className="text-red-400" />,
-          bgColor: "bg-red-500/10 border-red-500/15 text-red-300"
+          icon: <XCircle size={14} className="text-red-650" />,
+          bgColor: "bg-red-50 border-red-100 text-red-800"
         };
       case "bonus":
       case "effect":
         return {
-          icon: <Sparkles size={14} className="text-purple-400 animate-pulse" />,
-          bgColor: "bg-purple-500/10 border-purple-500/15 text-purple-300"
+          icon: <Sparkles size={14} className="text-purple-600" />,
+          bgColor: "bg-purple-50 border-purple-100 text-purple-800"
         };
       case "penalty":
         return {
-          icon: <XCircle size={14} className="text-orange-400" />,
-          bgColor: "bg-orange-500/10 border-orange-500/15 text-orange-300"
+          icon: <XCircle size={14} className="text-orange-600" />,
+          bgColor: "bg-orange-50 border-orange-100 text-orange-850"
         };
       default:
         return {
-          icon: <ScrollText size={14} className="text-gray-400" />,
-          bgColor: "bg-gray-800/20 border-white/5 text-gray-400"
+          icon: <ScrollText size={14} className="text-slate-400" />,
+          bgColor: "bg-slate-50 border-slate-100 text-slate-600"
         };
     }
   };
 
   return (
-    <div className="flex flex-col h-[280px] md:h-[400px] glass rounded-2xl border border-white/5 overflow-hidden">
+    <div className="flex flex-col h-[280px] md:h-[400px] bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="p-4 border-b border-white/5 flex items-center gap-2 bg-white/5">
-        <ScrollText size={18} className="text-indigo-400" />
-        <h3 className="text-sm font-black text-white tracking-wide uppercase">Diário do Plantão</h3>
+      <div className="p-4 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
+        <ScrollText size={18} className="text-indigo-600" />
+        <h3 className="text-sm font-black text-slate-800 tracking-wide uppercase">Diário do Plantão</h3>
       </div>
 
       {/* Logs List */}
       <div className="flex-1 p-4 overflow-y-auto space-y-2.5">
         {logs.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-xs text-gray-500 font-semibold italic">
+          <div className="h-full flex items-center justify-center text-xs text-slate-400 font-semibold italic">
             Nenhuma ocorrência registrada até agora...
           </div>
         ) : (
@@ -73,7 +73,7 @@ export const GameLog: React.FC = () => {
                         {team.name}
                       </span>
                     )}
-                    <span className="text-[9px] text-gray-500 font-bold select-none">{log.timestamp}</span>
+                    <span className="text-[9px] text-slate-400 font-bold select-none">{log.timestamp}</span>
                   </div>
                   <p className="font-medium leading-relaxed">{log.text}</p>
                 </div>

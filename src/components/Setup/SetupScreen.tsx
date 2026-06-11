@@ -94,8 +94,8 @@ export const SetupScreen: React.FC = () => {
     <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-8 animate-fade-in">
       {/* Cabeçalho */}
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-black text-white tracking-wide uppercase">Configuração das Equipes</h2>
-        <p className="text-sm text-gray-400">Monte o plantão com 2 a 4 equipes e defina seus peões.</p>
+        <h2 className="text-3xl font-black text-slate-800 tracking-wide uppercase">Configuração das Equipes</h2>
+        <p className="text-sm text-slate-500 font-semibold">Monte o plantão com 2 a 4 equipes e defina seus peões.</p>
       </div>
 
       {/* Grid de Equipes */}
@@ -107,16 +107,16 @@ export const SetupScreen: React.FC = () => {
           return (
             <div
               key={idx}
-              className="relative p-6 rounded-2xl glass border border-white/5 space-y-5 flex flex-col justify-between transition-all duration-300"
+              className="relative p-6 rounded-3xl bg-white border border-slate-100 space-y-5 flex flex-col justify-between transition-all duration-300 hover:shadow-md"
               style={{
-                boxShadow: `0 8px 30px -10px ${team.color}25, inset 0 0 20px rgba(255,255,255,0.01)`
+                boxShadow: `0 10px 30px -10px ${team.color}15, 0 4px 6px -1px rgba(0,0,0,0.01)`
               }}
             >
               {/* Botão de Excluir Equipe */}
               {teamsData.length > 2 && (
                 <button
                   onClick={() => handleRemoveTeam(idx)}
-                  className="absolute top-4 right-4 text-gray-500 hover:text-red-400 transition-colors p-1.5 hover:bg-white/5 rounded-lg cursor-pointer"
+                  className="absolute top-4 right-4 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors p-1.5 rounded-lg cursor-pointer"
                   title="Remover Equipe"
                 >
                   <Trash2 size={16} />
@@ -127,24 +127,24 @@ export const SetupScreen: React.FC = () => {
                 {/* Número da Equipe */}
                 <div className="flex items-center gap-2">
                   <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-black"
+                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white"
                     style={{ backgroundColor: team.color }}
                   >
                     {idx + 1}
                   </span>
-                  <span className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
                     Equipe {idx + 1}
                   </span>
                 </div>
 
                 {/* Input de Nome */}
                 <div className="relative">
-                  <User size={16} className="absolute left-3.5 top-3.5 text-gray-500" />
+                  <User size={16} className="absolute left-3.5 top-3.5 text-slate-400" />
                   <input
                     type="text"
                     value={team.name}
                     onChange={(e) => handleUpdateTeam(idx, { name: e.target.value })}
-                    className="w-full bg-black/40 border border-white/5 rounded-xl py-3 pl-11 pr-4 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500/50 transition-colors"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-11 pr-4 text-sm font-semibold text-slate-800 focus:outline-none focus:border-indigo-400 focus:bg-white transition-colors"
                     placeholder="Nome da Equipe..."
                     maxLength={25}
                   />
@@ -152,7 +152,7 @@ export const SetupScreen: React.FC = () => {
 
                 {/* Seletor de Cores */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Escolha a Cor</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Escolha a Cor</label>
                   <div className="flex flex-wrap gap-2">
                     {PRESET_COLORS.map((c) => {
                       const isColorUsed = usedColors.includes(c);
@@ -166,9 +166,9 @@ export const SetupScreen: React.FC = () => {
                           className={`w-6 h-6 rounded-full border-2 transition-all cursor-pointer ${
                             isColorUsed ? "opacity-15 cursor-not-allowed scale-75" : ""
                           } ${
-                            isSelected ? "scale-115 border-white shadow-lg" : "border-transparent hover:scale-105"
+                            isSelected ? "scale-115 border-white shadow-md ring-2 ring-indigo-400 ring-offset-2" : "border-slate-100 hover:scale-105"
                           }`}
-                          style={{ backgroundColor: c, boxShadow: isSelected ? `0 0 10px ${c}` : undefined }}
+                          style={{ backgroundColor: c }}
                         />
                       );
                     })}
@@ -177,7 +177,7 @@ export const SetupScreen: React.FC = () => {
 
                 {/* Seletor de Peões */}
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Escolha o Peão</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Escolha o Peão</label>
                   <div className="grid grid-cols-4 gap-2">
                     {pawnOptions.map((opt) => {
                       const isPawnUsed = usedPawns.includes(opt.id);
@@ -190,10 +190,10 @@ export const SetupScreen: React.FC = () => {
                           onClick={() => handleUpdateTeam(idx, { pawn: opt.id })}
                           className={`p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all ${
                             isPawnUsed
-                              ? "opacity-10 cursor-not-allowed bg-black/20 border-transparent text-gray-700"
+                              ? "opacity-20 cursor-not-allowed bg-slate-100 border-transparent text-slate-300"
                               : isSelected
-                              ? "border-white bg-white/10 text-white"
-                              : "border-white/5 bg-black/30 text-gray-400 hover:bg-white/5 hover:text-white cursor-pointer"
+                              ? "border-indigo-500 bg-indigo-50/70 text-indigo-600 shadow-sm font-bold scale-[1.03]"
+                              : "border-slate-100 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800 cursor-pointer"
                           }`}
                           title={opt.description}
                         >
@@ -209,18 +209,18 @@ export const SetupScreen: React.FC = () => {
               </div>
 
               {/* Preview do Peão */}
-              <div className="mt-4 flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/5">
+              <div className="mt-4 flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-black shadow-inner"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-sm"
                   style={{ backgroundColor: team.color }}
                 >
                   <PawnIcon type={team.pawn} size={20} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-white uppercase select-none">
+                  <p className="text-xs font-bold text-slate-700 uppercase select-none">
                     Preview do Peão
                   </p>
-                  <p className="text-[10px] text-gray-500 font-medium truncate">
+                  <p className="text-[10px] text-slate-500 font-medium truncate">
                     {pawnOptions.find((p) => p.id === team.pawn)?.description}
                   </p>
                 </div>
@@ -232,7 +232,7 @@ export const SetupScreen: React.FC = () => {
 
       {/* Mensagem de Erro */}
       {error && (
-        <div className="flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold animate-shake">
+        <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-bold animate-shake">
           <AlertCircle size={16} />
           <span>{error}</span>
         </div>
@@ -243,7 +243,7 @@ export const SetupScreen: React.FC = () => {
         {teamsData.length < 4 && (
           <button
             onClick={handleAddTeam}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 text-white font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
           >
             <Plus size={16} />
             <span>Adicionar Equipe</span>
@@ -252,7 +252,7 @@ export const SetupScreen: React.FC = () => {
 
         <button
           onClick={handleStartGame}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg hover:shadow-[0_0_20px_rgba(99,102,241,0.6)] animate-pulse-ring"
+          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-indigo-100/50 hover:shadow-indigo-200/70"
         >
           <Play size={16} />
           <span>Iniciar Partida</span>

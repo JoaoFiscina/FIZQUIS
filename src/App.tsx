@@ -38,7 +38,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen py-4 md:py-8 transition-all duration-500 text-gray-100">
+    <main className="min-h-screen py-4 md:py-8 transition-all duration-500 text-slate-800">
       {renderActiveScreen()}
     </main>
   );

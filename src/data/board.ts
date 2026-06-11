@@ -7,11 +7,11 @@ export const areaColors: Record<MedicalArea | "curinga" | "special" | "start" | 
   cirurgia: "#ef4444",    // Vermelho
   pediatria: "#10b981",    // Verde
   go: "#a855f7",          // Roxo
-  preventiva: "#eab308",  // Amarelo
+  preventiva: "#FBBF24",  // Amarelo
   urgencia: "#f97316",    // Laranja
   curinga: "#ec4899",     // Rosa/Multicolor (Rainbow)
   special: "#06b6d4",     // Ciano
-  start: "#6b7280",       // Cinza
+  start: "#8e9aaf",       // Cinza azulado amigável
   final: "#10b981"        // Verde esmeralda brilhante
 };
 

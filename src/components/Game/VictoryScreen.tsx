@@ -42,23 +42,23 @@ export const VictoryScreen: React.FC = () => {
   return (
     <div className="min-h-[80vh] flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-lg rounded-3xl glass-premium p-8 md:p-12 text-center border border-indigo-500/20 shadow-2xl space-y-8 animate-scale-up"
+        className="w-full max-w-lg rounded-3xl bg-white p-8 md:p-12 text-center border border-slate-100 shadow-2xl space-y-8 animate-scale-up"
         style={{
-          boxShadow: `0 10px 50px -10px ${winnerTeam.color}35, 0 0 0 1px rgba(99, 102, 241, 0.1)`
+          boxShadow: `0 15px 40px -10px ${winnerTeam.color}25, 0 0 0 1px rgba(0, 0, 0, 0.02)`
         }}
       >
         {/* Ícone de Troféu Brilhante */}
-        <div className="relative mx-auto w-24 h-24 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-400">
+        <div className="relative mx-auto w-24 h-24 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center text-yellow-600">
           <Trophy size={48} className="animate-bounce" />
           <div className="absolute inset-0 rounded-full border-2 border-yellow-400/20 animate-ping" />
         </div>
 
         {/* Informações da Vitória */}
         <div className="space-y-3">
-          <span className="text-[10px] font-black text-indigo-400 tracking-widest uppercase bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 rounded-full">
+          <span className="text-[10px] font-black text-indigo-700 tracking-widest uppercase bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
             Temos uma vencedora!
           </span>
-          <h2 className="text-3xl font-black text-white leading-tight uppercase">
+          <h2 className="text-3xl font-black text-slate-800 leading-tight uppercase">
             Vitória da Equipe
           </h2>
           <h3 className="text-2xl font-black uppercase tracking-wide" style={{ color: winnerTeam.color }}>
@@ -69,17 +69,17 @@ export const VictoryScreen: React.FC = () => {
         {/* Visual do Peão Vencedor */}
         <div className="flex justify-center">
           <div 
-            className="w-20 h-20 rounded-full flex items-center justify-center text-black shadow-2xl relative"
+            className="w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg relative border-4 border-white"
             style={{ 
               backgroundColor: winnerTeam.color,
-              filter: `drop-shadow(0 0 15px ${winnerTeam.color}80)`
+              filter: `drop-shadow(0 8px 12px ${winnerTeam.color}40)`
             }}
           >
             <PawnIcon type={winnerTeam.pawn} size={40} />
           </div>
         </div>
 
-        <p className="text-gray-400 text-sm leading-relaxed max-w-sm mx-auto font-medium">
+        <p className="text-slate-650 text-sm leading-relaxed max-w-sm mx-auto font-semibold">
           O plantão finalmente acabou! Esta equipe demonstrou condutas impecáveis, superou as intercorrências do round e conquistou a tão sonhada vaga na residência.
         </p>
 
@@ -87,7 +87,7 @@ export const VictoryScreen: React.FC = () => {
         <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
           <button
             onClick={resetGame}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-indigo-100/50 hover:shadow-indigo-200/50"
           >
             <RefreshCw size={16} />
             <span>Jogar Novamente</span>
@@ -95,7 +95,7 @@ export const VictoryScreen: React.FC = () => {
           
           <button
             onClick={resetGame}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 text-gray-300 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
           >
             <ArrowLeft size={16} />
             <span>Voltar ao Menu</span>
