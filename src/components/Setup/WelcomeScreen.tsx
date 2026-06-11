@@ -9,45 +9,64 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartSetup }) =>
   const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   return (
-    <div className="relative min-h-[80vh] flex flex-col items-center justify-center p-4 text-center space-y-8 animate-fade-in">
+    <div className="relative min-h-[85vh] flex flex-col items-center justify-center p-6 text-center animate-fade-in">
       {/* Elementos decorativos de fundo */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-indigo-200/20 rounded-full blur-[80px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-200/20 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-indigo-200/15 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-200/15 rounded-full blur-[80px] pointer-events-none" />
 
-      {/* Nome do Jogo & Subtítulo */}
-      <div className="space-y-4 max-w-xl relative">
-        {/* Ícone Pulsante */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm animate-pulse">
-          <Activity size={32} />
+      {/* Caixa Física de Tabuleiro */}
+      <div className="w-full max-w-2xl bg-white border-[10px] border-slate-800 rounded-[36px] shadow-[0_20px_50px_rgba(30,41,59,0.22)] p-8 md:p-12 relative flex flex-col items-center space-y-8 overflow-hidden">
+        {/* Costura tracejada interna da caixa */}
+        <div className="absolute inset-3 border-2 border-dashed border-slate-200 rounded-[24px] pointer-events-none" />
+
+        {/* Brilho reflexivo da tampa */}
+        <div className="absolute top-0 left-0 right-0 h-44 bg-gradient-to-b from-slate-50/50 to-transparent pointer-events-none" />
+
+        {/* Ícones de canto em baixa opacidade */}
+        <div className="absolute top-6 left-6 text-2xl opacity-10 pointer-events-none">🩺</div>
+        <div className="absolute top-6 right-6 text-2xl opacity-10 pointer-events-none">🏥</div>
+        <div className="absolute bottom-6 left-6 text-2xl opacity-10 pointer-events-none">💊</div>
+        <div className="absolute bottom-6 right-6 text-2xl opacity-10 pointer-events-none">🧪</div>
+
+        {/* Nome do Jogo & Subtítulo */}
+        <div className="space-y-4 max-w-lg relative z-10">
+          {/* Ícone Pulsante */}
+          <div className="mx-auto w-18 h-18 rounded-2xl bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center text-indigo-600 shadow-inner animate-pulse">
+            <Activity size={36} strokeWidth={2.5} />
+          </div>
+          
+          <h1 className="text-5xl md:text-6xl font-black text-slate-800 tracking-wide uppercase select-none leading-none">
+            Plantão <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-650 to-indigo-600">Board</span>
+          </h1>
+
+          <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-black uppercase tracking-widest rounded-full border border-indigo-100/50">
+            A Gincana da Residência Médica
+          </div>
+          
+          <p className="text-sm md:text-base text-slate-650 font-semibold leading-relaxed px-4 pt-1">
+            A gincana médica onde conhecimento, sorte e caos de plantão decidem quem conquista a vaga de residente.
+          </p>
         </div>
-        
-        <h1 className="text-5xl md:text-6xl font-black text-slate-800 tracking-wide uppercase select-none">
-          Plantão <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Board</span>
-        </h1>
-        
-        <p className="text-sm md:text-base text-slate-600 font-semibold leading-relaxed px-4">
-          A gincana médica onde conhecimento, sorte e caos de plantão decidem quem conquista a vaga de residente.
-        </p>
-      </div>
 
-      {/* Botões de Ação */}
-      <div className="flex flex-col sm:flex-row gap-4 w-full max-w-xs sm:max-w-none justify-center relative">
-        <button
-          onClick={onStartSetup}
-          className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-lg shadow-indigo-100/50 hover:shadow-indigo-200/70"
-        >
-          <Play size={16} fill="white" />
-          <span>Novo Jogo</span>
-        </button>
+        {/* Botões de Ação 3D */}
+        <div className="flex flex-col sm:flex-row gap-5 w-full max-w-md justify-center relative z-10 pt-2">
+          <button
+            onClick={onStartSetup}
+            className="btn-3d-indigo flex-1 px-8 py-3.5 rounded-2xl text-white font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2.5 cursor-pointer"
+          >
+            <Play size={15} fill="white" />
+            <span>Novo Jogo</span>
+          </button>
 
-        <button
-          onClick={() => setShowHowToPlay(true)}
-          className="px-8 py-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
-        >
-          <HelpCircle size={16} />
-          <span>Como Jogar</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setShowHowToPlay(true)}
+            className="btn-3d-white flex-1 px-8 py-3.5 rounded-2xl text-slate-700 font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <HelpCircle size={15} />
+            <span>Como Jogar</span>
+          </button>
+        </div>
+      </div>  </div>
 
       {/* Rodapé Decorativo */}
       <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest pt-8 select-none">
