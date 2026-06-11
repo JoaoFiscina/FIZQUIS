@@ -64,9 +64,29 @@ const getEffectIcon = (effect?: SpecialEffectType, area?: string, size = 15) => 
 };
 
 export const Board: React.FC = () => {
-  const { board, teams, currentTeamIndex, phase, isMoving, isReturning } = useGameStore();
+  const { board, teams, currentTeamIndex, phase, isMoving, isReturning, originPosition, selectedCell } = useGameStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+
+  const activeTeam = teams[currentTeamIndex];
+  const shouldZoom = (phase === "moving" || phase === "revealing_cell" || phase === "choosing_path" || isMoving) && activeTeam;
+
+  let currentZoom = 1.0;
+  let currentTx = 0;
+  let currentTy = 0;
+
+  if (shouldZoom) {
+    const targetCell = board.find((c) => c.id === activeTeam.position);
+    if (targetCell) {
+      const cx = targetCell.position.x * 10;
+      const cy = targetCell.position.y * 10;
+      const zoom = 1.15;
+      const maxOffset = 500 * (1 - 1 / zoom);
+      currentZoom = zoom;
+      currentTx = Math.max(-maxOffset, Math.min(maxOffset, 500 - cx));
+      currentTy = Math.max(-maxOffset, Math.min(maxOffset, 500 - cy));
+    }
+  }
 
   // Auto-scale to fit parent container
   useEffect(() => {
@@ -76,8 +96,8 @@ export const Board: React.FC = () => {
       if (!parent) return;
       const containerW = parent.clientWidth;
       const containerH = parent.clientHeight;
-      const scaleX = containerW / 1050;
-      const scaleY = containerH / 1050;
+      const scaleX = (containerW - 20) / 1050;
+      const scaleY = (containerH - 20) / 1050;
       setScale(Math.min(scaleX, scaleY, 1));
     };
 
@@ -92,6 +112,35 @@ export const Board: React.FC = () => {
       observer.disconnect();
     };
   }, []);
+
+  const [landedCells, setLandedCells] = useState<Record<number, { delay: number; key: number }>>({});
+  const prevPositionsRef = useRef<Record<string, number>>({});
+
+  useEffect(() => {
+    teams.forEach((team) => {
+      const prevPos = prevPositionsRef.current[team.id];
+      if (prevPos !== undefined && prevPos !== team.position) {
+        const nextPos = team.position;
+        if (nextPos > 0 || prevPos > 0) {
+          const delay = isReturning ? 600 : 750;
+          setLandedCells((prev) => ({
+            ...prev,
+            [nextPos]: { delay, key: Date.now() + Math.random() }
+          }));
+
+          // Remove after animation completes
+          setTimeout(() => {
+            setLandedCells((prev) => {
+              const copy = { ...prev };
+              delete copy[nextPos];
+              return copy;
+            });
+          }, delay + 450);
+        }
+      }
+      prevPositionsRef.current[team.id] = team.position;
+    });
+  }, [teams, isReturning]);
 
   // Render soft, curved path connections
   const renderPaths = () => {
@@ -212,7 +261,9 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
 
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
       const cellTeamsKey = teamsOnCell.map((t) => t.id).join("_");
-      const isOccupied = teamsOnCell.length > 0;
+
+      const isFinalCell = phase === "revealing_cell" && cell.id === activeTeam.position;
+      const isLandedCell = selectedCell && selectedCell.id === cell.id && (phase === "moving" || phase === "revealing_cell");
 
       return (
         <g 
@@ -229,6 +280,36 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
             }
           }}
         >
+          {/* Landing highlight pulse */}
+          {isLandedCell && (
+            <circle
+              cx={x}
+              cy={y}
+              r={r}
+              fill="none"
+              stroke={color}
+              className="pointer-events-none"
+            >
+              <animate attributeName="r" values={`${r};${r + 12}`} dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
+            </circle>
+          )}
+          {/* Origin cell highlight */}
+          {isMoving && cell.id === originPosition && (
+            <circle
+              cx={x}
+              cy={y}
+              r={r + 4}
+              fill="none"
+              stroke="#6366f1"
+              strokeWidth={2.2}
+              opacity={0.8}
+              className="animate-origin-highlight pointer-events-none"
+              style={{ transformOrigin: `${x}px ${y}px` } as React.CSSProperties}
+            />
+          )}
+
           {/* Selectable glow - soft drop shadow, no ring */}
           {isSelectable && (
             <circle
@@ -269,19 +350,23 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
 
           {/* Main cell circle */}
           <circle
-            key={`circle-${cell.id}-${cellTeamsKey}`}
+            key={`circle-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
             cx={x}
             cy={y}
             r={r}
             fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
             stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
             strokeWidth={isSpecial ? 3.5 : 3.0}
-            className={`transition-all duration-300 ${isOccupied ? "animate-cell-land" : ""}`}
+            className={`transition-all duration-300 ${
+              isFinalCell 
+                ? "animate-final-cell-highlight" 
+                : (landedCells[cell.id] ? "animate-cell-land" : "")
+            }`}
             style={{
               "--cell-color": color,
               "--cell-x": `${x}px`,
               "--cell-y": `${y}px`,
-              "--hop-duration": `${isReturning ? 500 : 700}ms`
+              "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 700)}ms`
             } as React.CSSProperties}
           />
 
@@ -359,7 +444,7 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
 
   // Render pawns as 3D game pieces
   const renderPawns = () => {
-    const hopDuration = isReturning ? 500 : 700;
+    const hopDuration = isReturning ? 600 : 750;
 
     return board.map((cell) => {
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
@@ -552,9 +637,10 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
         style={{
           width: "1050px",
           height: "1050px",
-          transform: `scale(${scale})`,
+          transform: `scale(${scale * currentZoom}) translate(${currentTx}px, ${currentTy}px)`,
           transformOrigin: "center center",
-          flexShrink: 0
+          flexShrink: 0,
+          transition: "transform 800ms cubic-bezier(0.25, 1, 0.5, 1)"
         }}
         className="relative select-none"
       >
@@ -665,7 +751,7 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
       </div>
 
       {/* Legend badge */}
-      <div className="absolute bottom-3 left-3 right-3 md:right-auto bg-white/90 backdrop-blur-md px-3 py-2 rounded-xl flex flex-wrap gap-2.5 text-[10px] border border-slate-200/70 pointer-events-none shadow-sm">
+      <div className="absolute bottom-2 left-2 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-xl flex flex-wrap gap-2 text-[9px] border border-slate-200/70 pointer-events-auto hover:opacity-10 transition-opacity duration-300 shadow-sm z-20">
         {Object.entries(areaColors).map(([area, color]) => {
           if (["special", "start", "final"].includes(area)) return null;
           
@@ -682,12 +768,12 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
           if (!name) return null;
 
           return (
-            <div key={area} className="flex items-center gap-1">
+            <div key={area} className="flex items-center gap-1.5">
               <span
-                className="w-3 h-3 rounded-full border border-white/80 shadow-sm"
+                className="w-2.5 h-2.5 rounded-full border border-white/80 shadow-sm animate-fade-in"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-slate-500 font-bold">{name}</span>
+              <span className="text-slate-500 font-extrabold">{name}</span>
             </div>
           );
         })}

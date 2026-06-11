@@ -9,7 +9,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartSetup }) =>
   const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   return (
-    <div className="relative min-h-[85vh] flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+    <div className="relative h-full max-h-full overflow-y-auto flex flex-col items-center justify-center p-6 text-center animate-fade-in">
       {/* Elementos decorativos de fundo */}
       <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-indigo-200/15 rounded-full blur-[80px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-purple-200/15 rounded-full blur-[80px] pointer-events-none" />

@@ -397,7 +397,7 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
         : "bg-slate-900/0 backdrop-blur-none duration-400 ease-in pointer-events-none"
   }`;
 
-  const cardClasses = `relative w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-[32px] border-[6px] border-slate-800 transition-all duration-500 ease-out flex flex-col ${
+  const cardClasses = `relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-white shadow-2xl rounded-[32px] border-[6px] border-slate-800 transition-all duration-500 ease-out flex flex-col ${
     animationState === "entering"
       ? "opacity-0 scale-90 translate-y-4"
       : animationState === "visible"

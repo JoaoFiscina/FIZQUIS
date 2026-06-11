@@ -261,8 +261,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 700ms por casa para animação (pulos lentos e visíveis)
-        await new Promise((resolve) => setTimeout(resolve, 700));
+        // Atraso de 870ms por casa para animação (pulo de 750ms + pausa de 120ms)
+        await new Promise((resolve) => setTimeout(resolve, 870));
 
         // Recursão
         await get().moveActiveTeam(stepsLeft - 1);
@@ -286,8 +286,8 @@ export const useGameStore = create<GameState>()(
           isReturning: false
         });
 
-        // Atraso antes do próximo passo (respeitando o tempo de pulo de 700ms)
-        await new Promise((resolve) => setTimeout(resolve, 700));
+        // Atraso antes do próximo passo (respeitando o tempo de pulo de 750ms + pausa de 120ms)
+        await new Promise((resolve) => setTimeout(resolve, 870));
         await get().moveActiveTeam(stepsLeft - 1);
       },
 
@@ -382,15 +382,12 @@ export const useGameStore = create<GameState>()(
           const targetTeamId = state.passPlantaoTargetTeamId;
           const targetTeam = state.teams.find((t) => t.id === targetTeamId)!;
 
-          let updatedTeams = [...state.teams];
-
           if (isCorrect) {
             // O outro time respondeu certo: O time da vez volta para a origem, o outro avança 2
             get().addLog(`${targetTeam.name} respondeu corretamente! ${activeTeam.name} volta para a origem. ${targetTeam.name} avança +2 casas.`, "effect");
             
             // Move o outro time +2 casas (simplificado/direto)
-            updatedTeams = updatedTeams.map((t) => {
-              if (t.id === activeTeam.id) return { ...t, position: origin };
+            const updatedTeams = state.teams.map((t) => {
               if (t.id === targetTeam.id) {
                 const targetCell = state.board.find((c) => c.id === t.position)!;
                 const nextId = targetCell.next?.[0] ?? t.position;
@@ -400,20 +397,32 @@ export const useGameStore = create<GameState>()(
               }
               return t;
             });
+
+            set({
+              teams: updatedTeams,
+              passPlantaoTargetTeamId: undefined,
+              activeQuestion: undefined,
+              selectedCell: undefined,
+              phase: "moving",
+              isMoving: true,
+              isReturning: true
+            });
+
+            await get().animateReturnToOrigin(origin);
+            return;
           } else {
             // O outro time errou: O time da vez permanece na casa. O outro time fica onde está.
             get().addLog(`${targetTeam.name} errou o plantão. ${activeTeam.name} permanece seguro na casa ${cell.id}.`, "effect");
+            
+            set({
+              passPlantaoTargetTeamId: undefined,
+              activeQuestion: undefined,
+              selectedCell: undefined,
+              phase: "waiting_roll",
+              currentTeamIndex: (state.currentTeamIndex + 1) % state.teams.length
+            });
+            return;
           }
-
-          set({
-            teams: updatedTeams,
-            passPlantaoTargetTeamId: undefined,
-            activeQuestion: undefined,
-            selectedCell: undefined,
-            phase: "waiting_roll",
-            currentTeamIndex: (state.currentTeamIndex + 1) % state.teams.length
-          });
-          return;
         }
 
         // --- TRATAMENTO DOS EFEITOS ESPECIAIS (CASO COMUM OU OUTRAS CASAS) ---
@@ -754,8 +763,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 500ms por casa (tempo de pulo no retorno)
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Atraso de 700ms por casa (tempo de pulo de 600ms + pausa de 100ms no retorno)
+        await new Promise((resolve) => setTimeout(resolve, 700));
 
         // Recursão
         await get().animateReturnToOrigin(targetPosition);

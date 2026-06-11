@@ -52,7 +52,7 @@ export const TargetSelectionModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-[32px] bg-white p-8 border-[6px] border-slate-800 text-center space-y-6 shadow-2xl animate-scale-up relative">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-[32px] bg-white p-8 border-[6px] border-slate-800 text-center space-y-6 shadow-2xl animate-scale-up relative">
         {/* Costura tracejada interna do card físico */}
         <div className="absolute inset-1.5 border-[2px] border-dashed border-slate-200 rounded-[22px] pointer-events-none" />
 

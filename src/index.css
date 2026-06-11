@@ -120,13 +120,13 @@
 }
 
 .animate-pawn-hop .pawn-body-anim {
-  transform-origin: center;
-  animation: pawnHop var(--hop-duration, 700ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: 0px 0px;
+  animation: pawnHop var(--hop-duration, 750ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .animate-pawn-hop .pawn-shadow-anim {
-  transform-origin: center;
-  animation: shadowHop var(--hop-duration, 700ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: 0px 14px;
+  animation: shadowHop var(--hop-duration, 750ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Fade in */
@@ -167,7 +167,7 @@
 
 /* Spring transition for pawn movement with variable duration */
 .transition-pawn-hop {
-  transition: transform var(--hop-duration, 700ms) cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform var(--hop-duration, 750ms) cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Cell land animation */
@@ -176,9 +176,9 @@
     transform: scale(1);
     filter: drop-shadow(0 0 0 transparent);
   }
-  30% {
-    transform: scale(1.06);
-    filter: drop-shadow(0 0 10px var(--cell-color, #ec4899));
+  50% {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 8px var(--cell-color, #ec4899));
   }
   100% {
     transform: scale(1);
@@ -187,7 +187,8 @@
 }
 .animate-cell-land {
   transform-origin: var(--cell-x, 0px) var(--cell-y, 0px);
-  animation: cellLand var(--hop-duration, 700ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: cellLand 350ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: var(--hop-delay, 750ms);
 }
 
 /* ===== VOLUMETRIC 3D BUTTONS & CARDS ===== */
@@ -296,4 +297,34 @@
 .btn-option-3d:active:not(:disabled) {
   transform: translateY(3.5px);
   box-shadow: 0 0 0 transparent;
+}
+
+/* Cell highlight animations */
+@keyframes originPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+  }
+}
+.animate-origin-highlight {
+  animation: originPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes finalCellHighlight {
+  0%, 100% {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 4px var(--cell-color, #ec4899)) drop-shadow(0 0 12px var(--cell-color, #ec4899));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 8px var(--cell-color, #ec4899)) drop-shadow(0 0 20px var(--cell-color, #ec4899));
+  }
+}
+.animate-final-cell-highlight {
+  transform-origin: var(--cell-x, 0px) var(--cell-y, 0px);
+  animation: finalCellHighlight 2s infinite ease-in-out;
 }

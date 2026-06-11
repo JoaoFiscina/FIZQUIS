@@ -87,7 +87,8 @@ export const SetupScreen: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-6 animate-fade-in">
+    <div className="h-full max-h-full overflow-y-auto animate-fade-in">
+      <div className="max-w-4xl mx-auto space-y-6 px-4 py-6 md:py-8">
       {/* Cabeçalho */}
       <div className="text-center space-y-2">
         <h2 className="text-3xl md:text-4xl font-black text-slate-800 tracking-wide uppercase leading-tight">Configuração de Equipes</h2>
@@ -279,5 +280,6 @@ export const SetupScreen: React.FC = () => {
         </button>
       </div>
     </div>
+  </div>
   );
 };

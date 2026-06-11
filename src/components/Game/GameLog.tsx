@@ -42,9 +42,9 @@ export const GameLog: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full bg-white/95 backdrop-blur-sm rounded-[24px] border-2 border-slate-100 overflow-hidden shadow-md">
+    <div className="flex flex-col h-full bg-white/95 backdrop-blur-sm rounded-[20px] border-2 border-slate-100 overflow-hidden shadow-md">
       {/* Header */}
-      <div className="px-3.5 py-2.5 bg-slate-50/50 border-b-2 border-slate-100 flex items-center gap-1.5 shrink-0">
+      <div className="px-3 py-2 bg-slate-50/50 border-b border-slate-100 flex items-center gap-1.5 shrink-0">
         <ScrollText size={14} className="text-indigo-500" />
         <h3 className="text-[10px] font-black text-slate-600 tracking-wider uppercase">Diário de Ocorrências</h3>
       </div>

@@ -40,9 +40,9 @@ export const VictoryScreen: React.FC = () => {
   if (!winnerTeam) return null;
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-4">
+    <div className="h-full max-h-full overflow-y-auto flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-lg rounded-[32px] bg-white p-8 md:p-12 text-center border-[6px] border-slate-800 shadow-2xl space-y-8 animate-scale-up relative"
+        className="w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[32px] bg-white p-8 md:p-12 text-center border-[6px] border-slate-800 shadow-2xl space-y-8 animate-scale-up relative"
         style={{
           boxShadow: `0 20px 50px -10px ${winnerTeam.color}30, 0 0 0 1px rgba(0, 0, 0, 0.02)`
         }}

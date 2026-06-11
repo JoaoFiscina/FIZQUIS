@@ -109,10 +109,10 @@ export const Dice: React.FC<DiceProps> = ({ onRoll, disabled }) => {
       <button
         onClick={onRoll}
         disabled={disabled || isRolling}
-        className={`flex-1 py-2.5 px-4 rounded-xl font-black tracking-wider text-xs transition-all duration-300 transform active:scale-[0.97] uppercase cursor-pointer ${
+        className={`flex-1 py-2.5 px-4 rounded-xl font-black tracking-wider text-xs uppercase cursor-pointer ${
           disabled || isRolling
             ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"
-            : "bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md shadow-indigo-200 hover:shadow-lg"
+            : "btn-3d-indigo text-white"
         }`}
       >
         {isRolling ? "..." : "Rolar"}
