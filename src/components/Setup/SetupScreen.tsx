@@ -279,6 +279,3 @@ export const SetupScreen: React.FC = () => {
     </div>
   );
 };
-    </div>
-  );
-};
