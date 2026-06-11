@@ -69,7 +69,15 @@ export const Board: React.FC = () => {
   const [scale, setScale] = useState(1);
 
   const activeTeam = teams[currentTeamIndex];
-  const shouldZoom = (phase === "moving" || phase === "revealing_cell" || phase === "choosing_path" || isMoving) && activeTeam;
+  const shouldZoom = (
+    phase === "moving" || 
+    phase === "revealing_cell" || 
+    phase === "choosing_path" || 
+    phase === "choosing_area" || 
+    phase === "answering" || 
+    phase === "resolving" || 
+    isMoving
+  ) && activeTeam;
 
   let currentZoom = 1.0;
   let currentTx = 0;
@@ -80,7 +88,7 @@ export const Board: React.FC = () => {
     if (targetCell) {
       const cx = targetCell.position.x * 10;
       const cy = targetCell.position.y * 10;
-      const zoom = 1.15;
+      const zoom = 1.40;
       const maxOffset = 500 * (1 - 1 / zoom);
       currentZoom = zoom;
       currentTx = Math.max(-maxOffset, Math.min(maxOffset, 500 - cx));
