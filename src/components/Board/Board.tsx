@@ -4,63 +4,67 @@ import { areaColors } from "../../data/board";
 import { PawnIcon } from "./PawnIcon";
 import { 
   Zap, 
-  HelpCircle, 
-  RotateCcw, 
   CheckCircle, 
   ShieldAlert, 
-  AlertTriangle,
-  Flame,
   Award,
   Send,
-  RefreshCw,
   CornerDownLeft,
-  UserX,
   Stethoscope,
   Scissors,
-  Activity
+  Activity,
+  Coffee,
+  Star,
+  HeartPulse,
+  Sparkles,
+  Siren,
+  Search,
+  ArrowLeftRight,
+  Baby,
+  Heart
 } from "lucide-react";
 import type { SpecialEffectType } from "../../types/game";
 
-const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
-  const size = 16;
+const getEffectIcon = (effect?: SpecialEffectType, area?: string, size = 15) => {
   switch (effect) {
     case "curinga":
-      return <HelpCircle size={size} className="text-white" />;
+      return <Sparkles size={size} className="text-white fill-yellow-100/30" />;
     case "plantao_tranquilo":
-      return <RotateCcw size={size} className="text-white" />;
+      return <Coffee size={size} className="text-white" />;
     case "evolucao_perfeita":
-      return <Zap size={size} className="text-white" />;
+      return <Star size={size} className="text-white fill-yellow-300 stroke-yellow-500" />;
     case "alta_hospitalar":
       return <CheckCircle size={size} className="text-white" />;
     case "dupla_checagem":
-      return <Zap size={size} className="text-white" />;
+      return <Search size={size} className="text-white" />;
     case "plantao_caotico":
-      return <AlertTriangle size={size} className="text-white" />;
+      return <Zap size={size} className="text-white fill-amber-300 stroke-amber-500 animate-pulse" />;
     case "caso_grave":
-      return <Flame size={size} className="text-white" />;
+      return <HeartPulse size={size} className="text-white" />;
     case "risco_cirurgico":
       return <ShieldAlert size={size} className="text-white" />;
     case "intercorrencia":
-      return <UserX size={size} className="text-white" />;
+      return <Siren size={size} className="text-white fill-red-300/40" />;
     case "pergunta_r3":
-      return <Award size={size} className="text-white" />;
+      return <Award size={size} className="text-white fill-yellow-400 stroke-yellow-600" />;
     case "passa_plantao":
       return <Send size={size} className="text-white" />;
     case "troca_leito":
-      return <RefreshCw size={size} className="text-white" />;
+      return <ArrowLeftRight size={size} className="text-white" />;
     case "contra_referencia":
       return <CornerDownLeft size={size} className="text-white" />;
     default:
-      if (area === "clinica") return <Stethoscope size={12} className="opacity-90 text-white" />;
-      if (area === "cirurgia") return <Scissors size={12} className="opacity-90 text-white" />;
-      if (area === "urgencia") return <Activity size={12} className="opacity-90 text-white" />;
-      if (area === "preventiva") return <ShieldAlert size={12} className="opacity-90 text-slate-700" />;
+      if (area === "clinica") return <Stethoscope size={size - 2} className="opacity-95 text-white" />;
+      if (area === "cirurgia") return <Scissors size={size - 2} className="opacity-95 text-white" />;
+      if (area === "urgencia") return <Activity size={size - 2} className="opacity-95 text-white" />;
+      if (area === "preventiva") return <ShieldAlert size={size - 2} className="opacity-95 text-white" />;
+      if (area === "pediatria") return <Baby size={size - 2} className="opacity-95 text-white" />;
+      if (area === "go") return <Heart size={size - 2} className="opacity-95 text-white" />;
       return null;
   }
 };
 
 export const Board: React.FC = () => {
-  const { board, teams, currentTeamIndex, phase } = useGameStore();
+  const { board, teams, currentTeamIndex, phase, isMoving, isReturning } = useGameStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -113,15 +117,15 @@ export const Board: React.FC = () => {
         const isShortcut = cell.pathGroup === "shortcut" || targetCell.pathGroup === "shortcut";
         const isLong = cell.pathGroup === "long" || targetCell.pathGroup === "long";
         
-        let roadColor = "#E2E8F0";
-        let borderColor = "#CBD5E1";
+        let roadColor = "#F3E8FF"; // Lilás claro macio para caminho comum
+        let borderColor = "#E9D5FF"; // Borda lilás para caminho comum
 
         if (isShortcut) {
-          roadColor = "#DBEAFE";
-          borderColor = "#93C5FD";
+          roadColor = "#E0F2FE"; // Azul claro macio para atalhos
+          borderColor = "#BAE6FD";
         } else if (isLong) {
-          roadColor = "#EDE9FE";
-          borderColor = "#C4B5FD";
+          roadColor = "#FEF3C7"; // Creme para o caminho longo
+          borderColor = "#FDE68A";
         }
 
         // Small curve for organic feel
@@ -143,7 +147,7 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke="rgba(0, 0, 0, 0.04)"
-              strokeWidth={28}
+              strokeWidth={52}
               strokeLinecap="round"
             />
             {/* Border */}
@@ -151,7 +155,7 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke={borderColor}
-              strokeWidth={22}
+              strokeWidth={44}
               strokeLinecap="round"
             />
             {/* Road body */}
@@ -159,17 +163,8 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke={roadColor}
-              strokeWidth={16}
+              strokeWidth={36}
               strokeLinecap="round"
-            />
-            {/* Center dashes */}
-            <path
-              d={pathD}
-              fill="none"
-              stroke="rgba(255,255,255,0.8)"
-              strokeWidth={1.5}
-              strokeLinecap="round"
-              strokeDasharray="3 7"
             />
           </g>
         );
@@ -178,6 +173,15 @@ export const Board: React.FC = () => {
 
     return lines;
   };
+
+const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
+  if (isStart) return "url(#grad-start)";
+  if (isFinal) return "url(#grad-final)";
+  if (cell.specialEffect === "curinga") return "url(#grad-curinga)";
+  if (cell.specialEffect) return "url(#grad-special)";
+  if (cell.area) return `url(#grad-${cell.area})`;
+  return "url(#grad-start)";
+};
 
   // Render board cells
   const renderCells = () => {
@@ -206,10 +210,19 @@ export const Board: React.FC = () => {
       const isSpecial = !!cell.specialEffect;
       const r = isStart || isFinal ? 24 : (isSpecial ? 20 : 16);
 
+      const teamsOnCell = teams.filter((t) => t.position === cell.id);
+      const cellTeamsKey = teamsOnCell.map((t) => t.id).join("_");
+      const isOccupied = teamsOnCell.length > 0;
+
       return (
         <g 
           key={`cell-${cell.id}`} 
-          className={`group ${isSelectable ? "cursor-pointer" : "cursor-default"}`}
+          className={`group transition-all duration-200 origin-center ${
+            isSelectable ? "cursor-pointer hover:scale-110" : "hover:scale-[1.05]"
+          }`}
+          style={{
+            transformOrigin: `${x}px ${y}px`,
+          } as React.CSSProperties}
           onClick={() => {
             if (isSelectable) {
               choosePath(cell.id);
@@ -233,22 +246,43 @@ export const Board: React.FC = () => {
           {/* 3D shadow beneath cell */}
           <ellipse
             cx={x}
-            cy={y + 3}
+            cy={y + 3.5}
             rx={r}
-            ry={r * 0.85}
-            fill="rgba(0, 0, 0, 0.1)"
-            className="pointer-events-none"
+            ry={r * 0.82}
+            fill="rgba(0, 0, 0, 0.12)"
+            className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
           />
+
+          {/* Special cell outer gold glow ring */}
+          {isSpecial && !isSelectable && (
+            <circle
+              cx={x}
+              cy={y}
+              r={r + 3}
+              fill="none"
+              stroke="url(#grad-gold-border)"
+              strokeWidth={1.5}
+              opacity={0.7}
+              className="pointer-events-none animate-gentle-pulse"
+            />
+          )}
 
           {/* Main cell circle */}
           <circle
+            key={`circle-${cell.id}-${cellTeamsKey}`}
             cx={x}
             cy={y}
             r={r}
-            fill={isSelectable ? "#ec4899" : color}
-            stroke="#FFFFFF"
-            strokeWidth={2.5}
-            className="transition-all duration-300"
+            fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
+            stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
+            strokeWidth={isSpecial ? 3.5 : 3.0}
+            className={`transition-all duration-300 ${isOccupied ? "animate-cell-land" : ""}`}
+            style={{
+              "--cell-color": color,
+              "--cell-x": `${x}px`,
+              "--cell-y": `${y}px`,
+              "--hop-duration": `${isReturning ? 500 : 700}ms`
+            } as React.CSSProperties}
           />
 
           {/* Glossy highlight */}
@@ -267,18 +301,26 @@ export const Board: React.FC = () => {
               cy={y}
               r={r - 3}
               fill="none"
-              stroke="rgba(255,255,255,0.35)"
+              stroke="rgba(255,255,255,0.4)"
               strokeWidth={1}
               strokeDasharray="3 3"
               className="pointer-events-none"
             />
           )}
 
+          {/* Small gold star seal badge for special cells */}
+          {isSpecial && !isSelectable && (
+            <g transform={`translate(${x + r - 3}, ${y - r + 3})`} className="pointer-events-none">
+              <circle r={5.5} fill="#D4AF37" stroke="#FFFFFF" strokeWidth={1} />
+              <polygon points="0,-2.5 0.7,-0.7 2.5,-0.7 1,0.4 1.5,2.2 0,1.1 -1.5,2.2 -1,0.4 -2.5,-0.7 -0.7,-0.7" fill="#FFFFFF" />
+            </g>
+          )}
+
           {/* Icon or ID */}
           <g transform={`translate(${x}, ${y})`}>
             {cell.specialEffect || (cell.type === "normal" && cell.area) ? (
-              <g transform={isSpecial ? "translate(-8, -8)" : "translate(-6, -6)"}>
-                {getEffectIcon(cell.specialEffect, cell.area)}
+              <g transform={`translate(-${(isSpecial ? 20 : 14) / 2}, -${(isSpecial ? 20 : 14) / 2})`}>
+                {getEffectIcon(cell.specialEffect, cell.area, isSpecial ? 20 : 14)}
               </g>
             ) : null}
 
@@ -286,10 +328,10 @@ export const Board: React.FC = () => {
             {!isStart && !isFinal && !isSpecial && !cell.area && (
               <text
                 x={0}
-                y={4}
+                y={3.5}
                 textAnchor="middle"
                 fill="#ffffff"
-                className="text-[10px] font-black select-none pointer-events-none"
+                className="text-[9px] font-black tracking-tighter select-none pointer-events-none"
               >
                 {cell.id}
               </text>
@@ -309,7 +351,7 @@ export const Board: React.FC = () => {
             )}
           </g>
 
-          <title>{`${cell.label} (Casa ${cell.id})`}</title>
+          <title>{isSpecial ? `Casa Especial: ${cell.label} (${cell.id})\nEfeito: ${cell.label}` : `${cell.label} (Casa ${cell.id})`}</title>
         </g>
       );
     });
@@ -317,6 +359,8 @@ export const Board: React.FC = () => {
 
   // Render pawns as 3D game pieces
   const renderPawns = () => {
+    const hopDuration = isReturning ? 500 : 700;
+
     return board.map((cell) => {
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
       if (teamsOnCell.length === 0) return null;
@@ -348,43 +392,73 @@ export const Board: React.FC = () => {
                 style={{
                   transform: `translate(${px}px, ${py}px)`,
                   "--glow-color": `${team.color}90`,
+                  "--hop-duration": `${hopDuration}ms`,
                 } as React.CSSProperties}
               >
-                {/* Pawn group with float animation for active */}
-                <g className={isActive ? "animate-pawn-float animate-glow-pulse" : ""}>
-                  {/* Base shadow */}
-                  <ellipse
-                    cx={0}
-                    cy={13}
-                    rx={9}
-                    ry={3}
-                    fill="rgba(0, 0, 0, 0.18)"
-                    className="pointer-events-none"
-                  />
+                {/* Remounts on position changes to restart jump keyframes */}
+                <g key={team.position} className="animate-pawn-hop">
+                  {/* Float wrapper - only active when NOT moving */}
+                  <g className={isActive && !isMoving ? "animate-active-pawn" : ""}>
+                    {/* Glow wrapper - active all the time */}
+                    <g className={isActive ? "animate-active-glow" : ""}>
+                      {/* Base shadow with blur */}
+                      <ellipse
+                        cx={0}
+                        cy={14}
+                        rx={9}
+                        ry={3}
+                        fill="rgba(0, 0, 0, 0.25)"
+                        filter="url(#shadowBlur)"
+                        className="pawn-shadow-anim pointer-events-none"
+                      />
 
-                  {/* Pawn body */}
-                  <circle
-                    cx={0}
-                    cy={0}
-                    r={13}
-                    fill={team.color}
-                    stroke="#FFFFFF"
-                    strokeWidth={2}
-                    className="pointer-events-none"
-                  />
+                      {/* Pawn body wrapper (handles hop vertical translate & scale) */}
+                      <g className="pawn-body-anim">
+                        {/* Outer white ring */}
+                        <circle
+                          cx={0}
+                          cy={0}
+                          r={14}
+                          fill="#FFFFFF"
+                          className="pointer-events-none"
+                        />
+                        
+                        {/* Main color circle */}
+                        <circle
+                          cx={0}
+                          cy={0}
+                          r={12.5}
+                          fill={team.color}
+                          className="pointer-events-none"
+                        />
 
-                  {/* Glossy effect */}
-                  <circle
-                    cx={0}
-                    cy={0}
-                    r={13}
-                    fill="url(#pawnGlossy)"
-                    className="pointer-events-none"
-                  />
+                        {/* Glossy overlay */}
+                        <circle
+                          cx={0}
+                          cy={0}
+                          r={12.5}
+                          fill="url(#pawnGlossy)"
+                          className="pointer-events-none"
+                        />
 
-                  {/* Pawn icon */}
-                  <g transform="translate(-7, -7)" className="text-white pointer-events-none">
-                    <PawnIcon type={team.pawn} size={14} />
+                        {/* 3D sphere specular highlight */}
+                        <ellipse
+                          cx={-4}
+                          cy={-4}
+                          rx={4}
+                          ry={2.5}
+                          fill="#ffffff"
+                          opacity={0.45}
+                          transform="rotate(-30, -4, -4)"
+                          className="pointer-events-none"
+                        />
+
+                        {/* Pawn icon */}
+                        <g transform="translate(-7, -7)" className="text-white pointer-events-none">
+                          <PawnIcon type={team.pawn} size={14} />
+                        </g>
+                      </g>
+                    </g>
                   </g>
                 </g>
 
@@ -400,17 +474,58 @@ export const Board: React.FC = () => {
   // Fun decorative elements
   const renderDecorations = () => {
     return (
-      <g id="decorations" className="pointer-events-none select-none" opacity={0.15}>
+      <>
         {/* Scattered medical emojis as fun decoration */}
-        <text x="150" y="450" fontSize="28">🩺</text>
-        <text x="850" y="500" fontSize="24">💉</text>
-        <text x="500" y="150" fontSize="22">🏥</text>
-        <text x="700" y="650" fontSize="20">🧬</text>
-        <text x="300" y="700" fontSize="22">💊</text>
-        <text x="900" y="250" fontSize="20">🔬</text>
-        <text x="100" y="200" fontSize="24">❤️</text>
-        <text x="600" y="800" fontSize="20">🩹</text>
-      </g>
+        <g id="decorations" className="pointer-events-none select-none animate-fade-in" opacity={0.13}>
+          <text x="150" y="450" fontSize="28">🩺</text>
+          <text x="850" y="500" fontSize="24">💉</text>
+          <text x="500" y="150" fontSize="22">🏥</text>
+          <text x="700" y="650" fontSize="20">🧬</text>
+          <text x="300" y="700" fontSize="22">💊</text>
+          <text x="900" y="250" fontSize="20">🔬</text>
+          <text x="100" y="200" fontSize="24">❤️</text>
+          <text x="600" y="800" fontSize="20">🩹</text>
+        </g>
+        
+        {/* Hospital wings decorative background badges */}
+        <g id="hospital-wings" className="pointer-events-none select-none" opacity={0.10} fill="#4338ca">
+          {/* Pronto-Socorro near bottom trail */}
+          <g transform="translate(500, 930)">
+            <rect x="-100" y="-18" width="200" height="36" rx="18" fill="#4338ca" opacity={0.12} />
+            <text textAnchor="middle" y="5" fontSize="13" fontWeight="950" letterSpacing="2.5">PRONTO-SOCORRO</text>
+          </g>
+
+          {/* Ambulatório near long path */}
+          <g transform="translate(500, 810)">
+            <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#4338ca" opacity={0.12} />
+            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">AMBULATÓRIO GERAL</text>
+          </g>
+
+          {/* Centro Cirúrgico near middle trail */}
+          <g transform="translate(480, 600)">
+            <rect x="-90" y="-16" width="180" height="32" rx="16" fill="#4338ca" opacity={0.12} />
+            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">CENTRO CIRÚRGICO</text>
+          </g>
+
+          {/* UTI near shortcut superior */}
+          <g transform="translate(740, 440)">
+            <rect x="-65" y="-16" width="130" height="32" rx="16" fill="#4338ca" opacity={0.12} />
+            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">U.T.I. CORONÁRIA</text>
+          </g>
+
+          {/* Enfermaria near curvature */}
+          <g transform="translate(820, 200)">
+            <rect x="-80" y="-16" width="160" height="32" rx="16" fill="#4338ca" opacity={0.12} />
+            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">ALA DE INTERNAÇÃO</text>
+          </g>
+
+          {/* Diretoria near final */}
+          <g transform="translate(300, 160)">
+            <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#4338ca" opacity={0.12} />
+            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">DIRETORIA DO HOSPITAL</text>
+          </g>
+        </g>
+      </>
     );
   };
 
@@ -449,6 +564,16 @@ export const Board: React.FC = () => {
           style={{ overflow: "visible" }}
         >
           <defs>
+            {/* Soft shadow blur filter */}
+            <filter id="shadowBlur" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="1.5" />
+            </filter>
+
+            {/* Cell Drop Shadow Filter */}
+            <filter id="cellShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="3" stdDeviation="2" floodOpacity="0.15" />
+            </filter>
+
             {/* Pawn glossy gradient */}
             <radialGradient id="pawnGlossy" cx="35%" cy="30%" r="65%">
               <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
@@ -460,8 +585,69 @@ export const Board: React.FC = () => {
             <radialGradient id="cellGlossy" cx="35%" cy="30%" r="65%">
               <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
               <stop offset="45%" stopColor="#ffffff" stopOpacity="0.0" />
-              <stop offset="100%" stopColor="#000000" stopOpacity="0.1" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="0.15" />
             </radialGradient>
+
+            {/* Gold border gradient */}
+            <linearGradient id="grad-gold-border" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#FFE07D" />
+              <stop offset="50%" stopColor="#D4AF37" />
+              <stop offset="100%" stopColor="#F5C042" />
+            </linearGradient>
+
+            {/* 3D gradients for each area */}
+            <linearGradient id="grad-clinica" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#76A9FF" />
+              <stop offset="100%" stopColor="#3B7AE6" />
+            </linearGradient>
+
+            <linearGradient id="grad-cirurgia" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFA1A1" />
+              <stop offset="100%" stopColor="#D93A3A" />
+            </linearGradient>
+
+            <linearGradient id="grad-pediatria" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#5BE6AA" />
+              <stop offset="100%" stopColor="#27A36E" />
+            </linearGradient>
+
+            <linearGradient id="grad-go" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#C295FF" />
+              <stop offset="100%" stopColor="#834DE0" />
+            </linearGradient>
+
+            <linearGradient id="grad-preventiva" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFE07D" />
+              <stop offset="100%" stopColor="#DCA524" />
+            </linearGradient>
+
+            <linearGradient id="grad-urgencia" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFAE6B" />
+              <stop offset="100%" stopColor="#D97021" />
+            </linearGradient>
+
+            <linearGradient id="grad-special" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#6BE8EB" />
+              <stop offset="100%" stopColor="#26A0A3" />
+            </linearGradient>
+
+            <linearGradient id="grad-start" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#CBD5E1" />
+              <stop offset="100%" stopColor="#64748B" />
+            </linearGradient>
+
+            <linearGradient id="grad-final" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FDE047" />
+              <stop offset="100%" stopColor="#CA8A04" />
+            </linearGradient>
+
+            {/* Multicolored gradient for wildcard / curinga */}
+            <linearGradient id="grad-curinga" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#E85AAD" />
+              <stop offset="35%" stopColor="#A56CF5" />
+              <stop offset="70%" stopColor="#4F8EF7" />
+              <stop offset="100%" stopColor="#3CBCBF" />
+            </linearGradient>
           </defs>
 
           {/* 1. Fun decorations */}

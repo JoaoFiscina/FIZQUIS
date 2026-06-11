@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useGameStore } from "../../store/gameStore";
-import { areaNames } from "../../data/board";
+import { areaNames, areaColors } from "../../data/board";
 import { 
   Zap, 
   HelpCircle, 
@@ -18,7 +18,8 @@ import {
   Scissors,
   Activity,
   HeartHandshake,
-  Play
+  Play,
+  Baby
 } from "lucide-react";
 import type { SpecialEffectType } from "../../types/game";
 import type { MedicalArea } from "../../types/questions";
@@ -28,7 +29,7 @@ interface CellRevealCardProps {
 }
 
 const getEffectDetails = (effect?: SpecialEffectType): { title: string; desc: string; icon: React.ReactNode } => {
-  const size = 32;
+  const size = 36;
   switch (effect) {
     case "curinga":
       return {
@@ -40,13 +41,13 @@ const getEffectDetails = (effect?: SpecialEffectType): { title: string; desc: st
       return {
         title: "Plantão Tranquilo",
         desc: "Acerto: Joga novamente. Erro: Volta para a origem.",
-        icon: <RotateCcw size={size} className="text-white animate-spin-slow" />
+        icon: <RotateCcw size={size} className="text-white" />
       };
     case "evolucao_perfeita":
       return {
         title: "Evolução Perfeita",
         desc: "Acerto: Avança +2 casas. Erro: Volta para a origem.",
-        icon: <Zap size={size} className="text-white animate-bounce" />
+        icon: <Zap size={size} className="text-white" />
       };
     case "alta_hospitalar":
       return {
@@ -70,7 +71,7 @@ const getEffectDetails = (effect?: SpecialEffectType): { title: string; desc: st
       return {
         title: "Caso Grave",
         desc: "Alerta Vermelho! Se errar, é mandado para a Enfermaria (caminho longo).",
-        icon: <Flame size={size} className="text-white text-orange-500 animate-pulse" />
+        icon: <Flame size={size} className="text-white animate-pulse" />
       };
     case "risco_cirurgico":
       return {
@@ -117,8 +118,113 @@ const getEffectDetails = (effect?: SpecialEffectType): { title: string; desc: st
   }
 };
 
+const getEffectConsequences = (effect: SpecialEffectType): { rule: string; consequences?: { correct: string; wrong: string } } => {
+  switch (effect) {
+    case "plantao_tranquilo":
+      return {
+        rule: "Alta tranquilidade no plantão!",
+        consequences: {
+          correct: "Avança e joga novamente (turno extra).",
+          wrong: "Volta para a casa de origem."
+        }
+      };
+    case "evolucao_perfeita":
+      return {
+        rule: "Evolução do paciente sem intercorrências!",
+        consequences: {
+          correct: "Avança +2 casas extras.",
+          wrong: "Volta para a casa de origem."
+        }
+      };
+    case "alta_hospitalar":
+      return {
+        rule: "O paciente recebeu alta!",
+        consequences: {
+          correct: "Pega um atalho salvador direto para a casa 23.",
+          wrong: "Volta para a casa de origem."
+        }
+      };
+    case "dupla_checagem":
+      return {
+        rule: "Bônus especial de segurança do paciente.",
+        consequences: {
+          correct: "Pode eliminar duas alternativas incorretas desta pergunta.",
+          wrong: "Se errar, volta para a origem normalmente."
+        }
+      };
+    case "plantao_caotico":
+      return {
+        rule: "Alta volatilidade no pronto-socorro!",
+        consequences: {
+          correct: "Avança +4 casas extras.",
+          wrong: "Volta 4 casas a partir da origem."
+        }
+      };
+    case "caso_grave":
+      return {
+        rule: "Alerta vermelho na enfermaria!",
+        consequences: {
+          correct: "Mantém a posição no tabuleiro.",
+          wrong: "Recua para a Enfermaria (caminho longo)."
+        }
+      };
+    case "risco_cirurgico":
+      return {
+        rule: "Dobre a aposta no centro cirúrgico!",
+        consequences: {
+          correct: "Avança o dobro do dado tirado.",
+          wrong: "Volta para a casa de origem."
+        }
+      };
+    case "intercorrencia":
+      return {
+        rule: "Intercorrência no setor!",
+        consequences: {
+          correct: "Escolha uma equipe adversária para voltar 3 casas.",
+          wrong: "Sua equipe volta 3 casas a partir da origem."
+        }
+      };
+    case "pergunta_r3":
+      return {
+        rule: "Pergunta avançada nível Residência!",
+        consequences: {
+          correct: "Avança +5 casas extras.",
+          wrong: "Volta para a casa de origem e perde o próximo turno."
+        }
+      };
+    case "passa_plantao":
+      return {
+        rule: "Estratégia clínica pura!",
+        consequences: {
+          correct: "Escolha outra equipe para responder a sua pergunta. Se ela errar, você fica seguro.",
+          wrong: "Se ela acertar, você volta para a origem."
+        }
+      };
+    case "troca_leito":
+      return {
+        rule: "Reviravolta na internação!",
+        consequences: {
+          correct: "Troque de posição com qualquer equipe à sua frente.",
+          wrong: "Volta para a casa de origem."
+        }
+      };
+    case "contra_referencia":
+      return {
+        rule: "Contra-referência do sistema!",
+        consequences: {
+          correct: "Escolha um adversário à frente para voltar 2 casas.",
+          wrong: "Sua equipe volta 2 casas da origem."
+        }
+      };
+    default:
+      return {
+        rule: "Resolva o caso clínico para manter sua posição."
+      };
+  }
+};
+
 const getAreaIcon = (area?: MedicalArea): React.ReactNode => {
-  const size = 32;
+  const size = 36;
   switch (area) {
     case "clinica":
       return <Stethoscope size={size} className="text-white" />;
@@ -127,9 +233,9 @@ const getAreaIcon = (area?: MedicalArea): React.ReactNode => {
     case "urgencia":
       return <Activity size={size} className="text-white animate-pulse" />;
     case "pediatria":
-      return <Activity size={size} className="text-white" />;
+      return <Baby size={size} className="text-white" />;
     case "go":
-      return <Award size={size} className="text-white" />;
+      return <HeartHandshake size={size} className="text-white" />;
     case "preventiva":
       return <ShieldAlert size={size} className="text-white" />;
     default:
@@ -137,8 +243,18 @@ const getAreaIcon = (area?: MedicalArea): React.ReactNode => {
   }
 };
 
+const areaPhrases: Record<MedicalArea, string> = {
+  clinica: "Hora de conduzir o caso clínico.",
+  cirurgia: "Prepare o bisturi e mantenha a calma.",
+  pediatria: "Atenção redobrada para os pequenos.",
+  go: "Momento de conduzir o parto com segurança.",
+  preventiva: "A prevenção é o melhor remédio.",
+  urgencia: "Ação rápida e precisa salvam vidas."
+};
+
 export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) => {
-  const { selectedCell, completeReveal, teams, currentTeamIndex } = useGameStore();
+  const { selectedCell, completeReveal, teams, currentTeamIndex, activeQuestion } = useGameStore();
+  const [animationState, setAnimationState] = useState<'entering' | 'visible' | 'exiting'>('entering');
   const [progress, setProgress] = useState(100);
 
   const activeTeam = teams[currentTeamIndex];
@@ -146,119 +262,234 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
   useEffect(() => {
     if (!selectedCell) return;
 
-    const duration = 1800;
-    const intervalTime = 18;
-    const steps = duration / intervalTime;
+    // 1. Entrada do card: 500 ms
+    setAnimationState("entering");
+    const entryTimeout = setTimeout(() => {
+      setAnimationState("visible");
+    }, 500);
+
+    // 2. Permanência na tela: 3500 ms (com barra de progresso decrementando)
+    const permanenceDuration = 3500;
+    const intervalTime = 20;
+    const steps = permanenceDuration / intervalTime;
     let currentStep = steps;
+    let progressInterval: any;
 
-    const interval = setInterval(() => {
-      currentStep -= 1;
-      setProgress(Math.max(0, (currentStep / steps) * 100));
-      if (currentStep <= 0) {
-        clearInterval(interval);
-        handleDismiss();
-      }
-    }, intervalTime);
+    const visibleTimeout = setTimeout(() => {
+      progressInterval = setInterval(() => {
+        currentStep -= 1;
+        setProgress(Math.max(0, (currentStep / steps) * 100));
+        if (currentStep <= 0) {
+          clearInterval(progressInterval);
+        }
+      }, intervalTime);
+    }, 500);
 
-    return () => clearInterval(interval);
-  }, [selectedCell]);
+    // 3. Saída do card: 400 ms (depois da permanência)
+    let exitTimeout: any;
+    const autoDismissTimeout = setTimeout(() => {
+      setAnimationState("exiting");
+      exitTimeout = setTimeout(() => {
+        if (onComplete) {
+          onComplete();
+        } else {
+          completeReveal();
+        }
+      }, 400);
+    }, 500 + permanenceDuration);
+
+    return () => {
+      clearTimeout(entryTimeout);
+      clearTimeout(visibleTimeout);
+      clearTimeout(autoDismissTimeout);
+      if (progressInterval) clearInterval(progressInterval);
+      if (exitTimeout) clearTimeout(exitTimeout);
+    };
+  }, [selectedCell, completeReveal, onComplete]);
 
   if (!selectedCell) return null;
 
   const isSpecial = !!selectedCell.specialEffect;
   const effectDetails = getEffectDetails(selectedCell.specialEffect);
   
-  let bgGradient = "from-blue-500 to-indigo-600";
-  let cellName = selectedCell.label;
-  let subtitle = "Hora de conduzir o caso clínico!";
-  let icon = selectedCell.area ? getAreaIcon(selectedCell.area) : effectDetails.icon;
+  let themeColor = "#4F8EF7"; // Default
+  if (selectedCell.id === 50) themeColor = areaColors.final;
+  else if (selectedCell.specialEffect === "curinga") themeColor = areaColors.curinga;
+  else if (selectedCell.specialEffect) themeColor = areaColors.special;
+  else if (selectedCell.area) themeColor = areaColors[selectedCell.area];
+
+  let cardTitle = "";
+  let cardSubtitle = "";
+  let cardIcon = null;
+  let showAreaLine = false;
+  let medicalAreaText = "";
+  let consequencesHtml = null;
 
   if (selectedCell.id === 50) {
-    bgGradient = "from-emerald-500 to-teal-600 animate-pulse";
-    cellName = "Plantão Final!";
-    subtitle = "A pergunta decisiva para a vitória!";
-  } else if (isSpecial) {
-    bgGradient = `from-cyan-500 to-blue-600`;
-    cellName = effectDetails.title;
-    subtitle = effectDetails.desc;
-    icon = effectDetails.icon;
-  } else if (selectedCell.area) {
-    const areaName = areaNames[selectedCell.area];
-    cellName = areaName;
+    cardTitle = "Plantão Final!";
+    cardSubtitle = "A pergunta decisiva para a vitória!";
+    cardIcon = <Award size={36} className="text-white" />;
+    if (activeQuestion?.area) {
+      showAreaLine = true;
+      medicalAreaText = areaNames[activeQuestion.area];
+    }
+  } else if (selectedCell.specialEffect === "curinga") {
+    cardTitle = "Casa Curinga";
+    cardSubtitle = "Escolha a área da pergunta.";
+    cardIcon = <HelpCircle size={36} className="text-white" />;
+  } else if (isSpecial && selectedCell.specialEffect) {
+    const consequences = getEffectConsequences(selectedCell.specialEffect);
     
-    if (selectedCell.area === "clinica") bgGradient = "from-blue-500 to-blue-600";
-    else if (selectedCell.area === "cirurgia") bgGradient = "from-red-500 to-rose-600";
-    else if (selectedCell.area === "pediatria") bgGradient = "from-emerald-500 to-teal-600";
-    else if (selectedCell.area === "go") bgGradient = "from-purple-500 to-fuchsia-600";
-    else if (selectedCell.area === "preventiva") bgGradient = "from-amber-500 to-yellow-600";
-    else if (selectedCell.area === "urgencia") bgGradient = "from-orange-500 to-red-600";
+    cardTitle = effectDetails.title;
+    cardSubtitle = consequences.rule;
+    cardIcon = effectDetails.icon;
+    
+    if (activeQuestion?.area) {
+      showAreaLine = true;
+      medicalAreaText = areaNames[activeQuestion.area];
+    }
+    
+    if (consequences.consequences) {
+      consequencesHtml = (
+        <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-left space-y-2.5 w-full">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+            Consequências da Conduta
+          </span>
+          <div className="flex items-start gap-2.5">
+            <span className="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center text-[10px] font-black text-green-600 border border-green-100 shrink-0 mt-0.5">✓</span>
+            <p className="text-xs text-slate-600 font-bold leading-relaxed">
+              <span className="text-green-600 font-black">Acertou:</span> {consequences.consequences.correct}
+            </p>
+          </div>
+          <div className="flex items-start gap-2.5">
+            <span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-[10px] font-black text-red-600 border border-red-100 shrink-0 mt-0.5">✗</span>
+            <p className="text-xs text-slate-600 font-bold leading-relaxed">
+              <span className="text-red-600 font-black">Errou:</span> {consequences.consequences.wrong}
+            </p>
+          </div>
+        </div>
+      );
+    }
+  } else if (selectedCell.area) {
+    cardTitle = areaNames[selectedCell.area];
+    cardSubtitle = areaPhrases[selectedCell.area];
+    cardIcon = getAreaIcon(selectedCell.area);
   }
 
   const handleDismiss = () => {
-    if (onComplete) {
-      onComplete();
-    } else {
-      completeReveal();
-    }
+    if (animationState !== "visible") return;
+    
+    setAnimationState("exiting");
+    setTimeout(() => {
+      if (onComplete) {
+        onComplete();
+      } else {
+        completeReveal();
+      }
+    }, 400);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-3xl animate-scale-up border border-slate-100">
-        
-        <div className={`p-8 bg-gradient-to-br ${bgGradient} text-white flex flex-col items-center text-center relative overflow-hidden`}>
-          <div className="absolute w-32 h-32 bg-white/10 rounded-full -top-10 -right-10 pointer-events-none" />
-          <div className="absolute w-24 h-24 bg-white/10 rounded-full -bottom-8 -left-8 pointer-events-none" />
+  const backdropClasses = `fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-500 ease-out ${
+    animationState === "entering" 
+      ? "bg-slate-900/0 backdrop-blur-none pointer-events-none" 
+      : animationState === "visible" 
+        ? "bg-slate-900/60 backdrop-blur-sm" 
+        : "bg-slate-900/0 backdrop-blur-none duration-400 ease-in pointer-events-none"
+  }`;
 
+  const cardClasses = `relative w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-[32px] border border-slate-100 transition-all duration-500 ease-out flex flex-col ${
+    animationState === "entering"
+      ? "opacity-0 scale-90 translate-y-4"
+      : animationState === "visible"
+        ? "opacity-100 scale-100 translate-y-0"
+        : "opacity-0 scale-90 translate-y-4 duration-400 ease-in"
+  }`;
+
+  return (
+    <div className={backdropClasses}>
+      <div className={cardClasses}>
+        
+        {/* Linha colorida decorativa no topo */}
+        <div className="h-2 w-full shrink-0" style={{ backgroundColor: themeColor }} />
+
+        <div className="p-8 flex flex-col items-center text-center relative flex-1">
           {activeTeam && (
             <div 
               style={{ backgroundColor: activeTeam.color }} 
-              className="px-3 py-1 mb-4 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md text-white border border-white/20 animate-bounce"
+              className="px-4 py-1 mb-5 text-[10px] font-black uppercase tracking-wider rounded-full shadow-sm text-white"
             >
               Vez de: {activeTeam.name}
             </div>
           )}
 
-          <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-2xl bg-white/15 backdrop-blur-md shadow-inner border border-white/20">
-            {icon}
+          <div 
+            className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg border border-white/20 mb-5 text-white transition-transform hover:scale-105 duration-300"
+            style={{ 
+              backgroundColor: themeColor,
+              boxShadow: `0 10px 25px -5px ${themeColor}50`
+            }}
+          >
+            {cardIcon}
           </div>
 
-          <h3 className="text-2xl font-black tracking-tight leading-tight">
-            {cellName}
+          <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">
+            {cardTitle}
           </h3>
           
-          <p className="mt-1 text-xs text-white/80 font-medium">
-            Casa {selectedCell.id} • {selectedCell.region === "inicio" ? "Região Inicial" : selectedCell.region === "meio" ? "Região do Meio" : "Região Final"}
+          <p className="mt-1.5 text-xs text-slate-400 font-bold uppercase tracking-wider">
+            Casa {selectedCell.id} • {
+              selectedCell.region === "inicio" 
+                ? "Região Inicial" 
+                : selectedCell.region === "meio" 
+                  ? "Região do Meio" 
+                  : "Região Final"
+            }
           </p>
-        </div>
 
-        <div className="p-6 text-center">
-          <p className="text-slate-600 font-semibold text-sm leading-relaxed mb-6">
-            {isSpecial ? "Esta é uma casa com evento especial. Prepare-se para as consequências:" : subtitle}
-          </p>
-
-          {isSpecial && (
-            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-6 text-left">
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Impacto do Efeito</span>
-              <p className="text-slate-700 text-xs font-bold leading-relaxed">
-                {effectDetails.desc}
-              </p>
+          {showAreaLine && (
+            <div className="flex items-center gap-2 justify-center mt-3">
+              <span className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Área:</span>
+              <span 
+                className="px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wide text-white shadow-sm"
+                style={{ backgroundColor: activeQuestion ? areaColors[activeQuestion.area] : themeColor }}
+              >
+                {medicalAreaText}
+              </span>
             </div>
           )}
 
-          <button
-            onClick={handleDismiss}
-            className="w-full py-3 px-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group"
-          >
-            <Play size={14} className="fill-current text-white group-hover:translate-x-0.5 transition-transform" />
-            Responder Pergunta
-          </button>
+          <div className="w-12 h-1 bg-slate-100 rounded-full my-5 shrink-0" />
+
+          <p className="text-slate-600 font-bold text-base leading-relaxed max-w-sm">
+            “{cardSubtitle}”
+          </p>
+
+          {consequencesHtml}
+
+          <div className="flex-grow min-h-[20px]" />
+
+          <div className="w-full mt-6">
+            <button
+              onClick={handleDismiss}
+              className="w-full py-4 px-6 text-white rounded-2xl font-black text-sm active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+              style={{ 
+                backgroundColor: themeColor, 
+                boxShadow: `0 8px 20px -6px ${themeColor}50`
+              }}
+            >
+              <Play size={14} className="fill-current text-white group-hover:translate-x-0.5 transition-transform" />
+              Responder Pergunta
+            </button>
+          </div>
         </div>
 
-        <div className="w-full h-1.5 bg-slate-100 relative">
+        <div className="w-full h-1.5 bg-slate-50 relative shrink-0">
           <div 
-            className={`h-full bg-gradient-to-r ${bgGradient} transition-all duration-75 ease-linear`}
-            style={{ width: `${progress}%` }}
+            className="h-full transition-all duration-75 ease-linear"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: themeColor
+            }}
           />
         </div>
 

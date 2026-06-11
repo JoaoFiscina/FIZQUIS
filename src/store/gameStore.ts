@@ -26,6 +26,7 @@ interface GameState {
   eliminatedOptions: ("A" | "B" | "C" | "D")[]; // Opções eliminadas por Dupla Checagem
   passPlantaoTargetTeamId?: string; // Equipe alvo do "Passa o Plantão"
   isMoving: boolean;
+  isReturning: boolean;
 
   // Actions
   initializeGame: (teamsData: { name: string; color: string; pawn: PawnType }[]) => void;
@@ -93,6 +94,7 @@ export const useGameStore = create<GameState>()(
       eliminatedOptions: [],
       passPlantaoTargetTeamId: undefined,
       isMoving: false,
+      isReturning: false,
 
       // Actions
       addLog: (text, type) => {
@@ -134,7 +136,8 @@ export const useGameStore = create<GameState>()(
           extraTurnActive: false,
           eliminatedOptions: [],
           passPlantaoTargetTeamId: undefined,
-          isMoving: false
+          isMoving: false,
+          isReturning: false
         });
 
         get().addLog("Partida iniciada! Que vença a melhor equipe.", "system");
@@ -173,7 +176,8 @@ export const useGameStore = create<GameState>()(
           diceValue: rolled,
           originPosition: activeTeam.position,
           phase: "moving",
-          isMoving: true
+          isMoving: true,
+          isReturning: false
         });
 
         // Inicia movimento passo a passo
@@ -192,6 +196,9 @@ export const useGameStore = create<GameState>()(
           // Resolver o pouso na casa
           const destinationCell = state.board.find((c) => c.id === activeTeam.position)!;
           set({ selectedCell: destinationCell });
+
+          // Aguarda a pulsação/destaque da casa no tabuleiro antes de abrir a revelação
+          await new Promise((resolve) => setTimeout(resolve, 850));
 
           // Se cair na casa final 50
           if (destinationCell.id === 50) {
@@ -275,11 +282,12 @@ export const useGameStore = create<GameState>()(
           teams: updatedTeams,
           phase: "moving",
           remainingStepsAfterChoice: undefined,
-          isMoving: true
+          isMoving: true,
+          isReturning: false
         });
 
-        // Atraso antes do próximo passo
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // Atraso antes do próximo passo (respeitando o tempo de pulo de 700ms)
+        await new Promise((resolve) => setTimeout(resolve, 700));
         await get().moveActiveTeam(stepsLeft - 1);
       },
 
@@ -610,7 +618,8 @@ export const useGameStore = create<GameState>()(
           // Inicia a movimentação de volta
           set({
             phase: "moving",
-            isMoving: true
+            isMoving: true,
+            isReturning: true
           });
           await get().animateReturnToOrigin(finalPosition);
         }
@@ -700,7 +709,8 @@ export const useGameStore = create<GameState>()(
           extraTurnActive: false,
           eliminatedOptions: [],
           passPlantaoTargetTeamId: undefined,
-          isMoving: false
+          isMoving: false,
+          isReturning: false
         });
       },
 
@@ -720,7 +730,7 @@ export const useGameStore = create<GameState>()(
         const activeTeam = state.teams[state.currentTeamIndex];
 
         if (activeTeam.position === targetPosition) {
-          set({ isMoving: false });
+          set({ isMoving: false, isReturning: false });
 
           // Finaliza o turno e passa para a próxima equipe
           const nextTeamIndex = state.extraTurnActive
@@ -744,8 +754,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 400ms por casa
-        await new Promise((resolve) => setTimeout(resolve, 400));
+        // Atraso de 500ms por casa (tempo de pulo no retorno)
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Recursão
         await get().animateReturnToOrigin(targetPosition);
