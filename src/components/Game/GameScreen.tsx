@@ -2,7 +2,6 @@ import React from "react";
 import { useGameStore } from "../../store/gameStore";
 import { Board } from "../Board/Board";
 import { Dice } from "../Dice/Dice";
-import { GameLog } from "./GameLog";
 import { QuestionModal } from "../Questions/QuestionModal";
 import { AreaSelector } from "../Questions/AreaSelector";
 import { TargetSelectionModal } from "./TargetSelectionModal";
@@ -165,11 +164,6 @@ export const GameScreen: React.FC = () => {
                 Último Giro: {diceValue} casas
               </p>
             )}
-          </div>
-
-          {/* Histórico / Logs - flex grow with internal scroll */}
-          <div className="flex-1 min-h-0">
-            <GameLog />
           </div>
         </div>
       </div>

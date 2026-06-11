@@ -88,7 +88,7 @@ export const Board: React.FC = () => {
     if (targetCell) {
       const cx = targetCell.position.x * 10;
       const cy = targetCell.position.y * 10;
-      const zoom = 1.40;
+      const zoom = 1.80;
       const maxOffset = 500 * (1 - 1 / zoom);
       currentZoom = zoom;
       currentTx = Math.max(-maxOffset, Math.min(maxOffset, 500 - cx));
