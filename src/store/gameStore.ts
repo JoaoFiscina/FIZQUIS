@@ -163,7 +163,7 @@ export const useGameStore = create<GameState>()(
         set({ phase: "rolling" });
 
         // Simula animação de rolagem de dado
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        await new Promise((resolve) => setTimeout(resolve, 1400));
 
         const rolled = Math.floor(Math.random() * 6) + 1;
         
@@ -254,8 +254,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 500ms por casa para animação (pulos lentos e visíveis)
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Atraso de 700ms por casa para animação (pulos lentos e visíveis)
+        await new Promise((resolve) => setTimeout(resolve, 700));
 
         // Recursão
         await get().moveActiveTeam(stepsLeft - 1);

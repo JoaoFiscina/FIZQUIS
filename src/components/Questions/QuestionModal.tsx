@@ -69,7 +69,7 @@ export const QuestionModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
       <div 
-        className="w-full max-w-2xl rounded-3xl bg-white overflow-hidden border border-slate-100 shadow-2xl animate-fade-in"
+        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white overflow-x-hidden border border-slate-100 shadow-2xl animate-scale-up"
         style={{
           boxShadow: `0 15px 40px -10px ${areaColor}25, 0 0 0 1px rgba(0, 0, 0, 0.02)`
         }}

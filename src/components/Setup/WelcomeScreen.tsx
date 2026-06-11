@@ -17,7 +17,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartSetup }) =>
       {/* Nome do Jogo & Subtítulo */}
       <div className="space-y-4 max-w-xl relative">
         {/* Ícone Pulsante */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm animate-pulse-slow">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm animate-pulse">
           <Activity size={32} />
         </div>
         

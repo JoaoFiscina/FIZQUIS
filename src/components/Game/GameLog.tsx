@@ -9,51 +9,51 @@ export const GameLog: React.FC = () => {
     switch (type) {
       case "roll":
         return {
-          icon: <Dice5 size={14} className="text-blue-600" />,
-          bgColor: "bg-blue-50 border-blue-100 text-blue-800"
+          icon: <Dice5 size={12} className="text-blue-500" />,
+          bgColor: "bg-blue-50/80 border-blue-100 text-blue-700"
         };
       case "correct":
         return {
-          icon: <CheckCircle size={14} className="text-green-600" />,
-          bgColor: "bg-green-50 border-green-100 text-green-800"
+          icon: <CheckCircle size={12} className="text-green-500" />,
+          bgColor: "bg-green-50/80 border-green-100 text-green-700"
         };
       case "wrong":
         return {
-          icon: <XCircle size={14} className="text-red-650" />,
-          bgColor: "bg-red-50 border-red-100 text-red-800"
+          icon: <XCircle size={12} className="text-red-500" />,
+          bgColor: "bg-red-50/80 border-red-100 text-red-700"
         };
       case "bonus":
       case "effect":
         return {
-          icon: <Sparkles size={14} className="text-purple-600" />,
-          bgColor: "bg-purple-50 border-purple-100 text-purple-800"
+          icon: <Sparkles size={12} className="text-purple-500" />,
+          bgColor: "bg-purple-50/80 border-purple-100 text-purple-700"
         };
       case "penalty":
         return {
-          icon: <XCircle size={14} className="text-orange-600" />,
-          bgColor: "bg-orange-50 border-orange-100 text-orange-850"
+          icon: <XCircle size={12} className="text-orange-500" />,
+          bgColor: "bg-orange-50/80 border-orange-100 text-orange-700"
         };
       default:
         return {
-          icon: <ScrollText size={14} className="text-slate-400" />,
-          bgColor: "bg-slate-50 border-slate-100 text-slate-600"
+          icon: <ScrollText size={12} className="text-slate-400" />,
+          bgColor: "bg-slate-50/80 border-slate-100 text-slate-600"
         };
     }
   };
 
   return (
-    <div className="flex flex-col h-[280px] md:h-[400px] bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+    <div className="flex flex-col h-full bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 flex items-center gap-2 bg-slate-50/50">
-        <ScrollText size={18} className="text-indigo-600" />
-        <h3 className="text-sm font-black text-slate-800 tracking-wide uppercase">Diário do Plantão</h3>
+      <div className="px-3 py-2 border-b border-slate-100 flex items-center gap-1.5 shrink-0">
+        <ScrollText size={14} className="text-indigo-500" />
+        <h3 className="text-[10px] font-black text-slate-600 tracking-wider uppercase">Diário</h3>
       </div>
 
-      {/* Logs List */}
-      <div className="flex-1 p-4 overflow-y-auto space-y-2.5">
+      {/* Logs List - scrollable */}
+      <div className="flex-1 p-2 overflow-y-auto space-y-1.5 min-h-0">
         {logs.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-xs text-slate-400 font-semibold italic">
-            Nenhuma ocorrência registrada até agora...
+          <div className="h-full flex items-center justify-center text-[10px] text-slate-400 font-semibold italic">
+            Nenhuma ocorrência...
           </div>
         ) : (
           logs.map((log) => {
@@ -63,19 +63,19 @@ export const GameLog: React.FC = () => {
             return (
               <div
                 key={log.id}
-                className={`p-3 rounded-xl border flex items-start gap-2.5 text-xs transition-all duration-200 hover:scale-[1.01] ${style.bgColor}`}
+                className={`p-2 rounded-xl border flex items-start gap-2 text-[10px] ${style.bgColor}`}
               >
                 <span className="mt-0.5 shrink-0">{style.icon}</span>
-                <div className="flex-1 space-y-1">
-                  <div className="flex items-center justify-between gap-2">
+                <div className="flex-1 space-y-0.5 min-w-0">
+                  <div className="flex items-center justify-between gap-1">
                     {team && (
-                      <span className="font-extrabold uppercase text-[10px]" style={{ color: team.color }}>
+                      <span className="font-extrabold uppercase text-[9px] truncate" style={{ color: team.color }}>
                         {team.name}
                       </span>
                     )}
-                    <span className="text-[9px] text-slate-400 font-bold select-none">{log.timestamp}</span>
+                    <span className="text-[8px] text-slate-400 font-bold select-none shrink-0">{log.timestamp}</span>
                   </div>
-                  <p className="font-medium leading-relaxed">{log.text}</p>
+                  <p className="font-medium leading-snug text-[10px]">{log.text}</p>
                 </div>
               </div>
             );

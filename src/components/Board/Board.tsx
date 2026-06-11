@@ -22,14 +22,14 @@ import {
 import type { SpecialEffectType } from "../../types/game";
 
 const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
-  const size = 18;
+  const size = 16;
   switch (effect) {
     case "curinga":
       return <HelpCircle size={size} className="text-white" />;
     case "plantao_tranquilo":
       return <RotateCcw size={size} className="text-white" />;
     case "evolucao_perfeita":
-      return <Zap size={size} className="text-white animate-bounce" />;
+      return <Zap size={size} className="text-white" />;
     case "alta_hospitalar":
       return <CheckCircle size={size} className="text-white" />;
     case "dupla_checagem":
@@ -51,10 +51,10 @@ const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
     case "contra_referencia":
       return <CornerDownLeft size={size} className="text-white" />;
     default:
-      if (area === "clinica") return <Stethoscope size={13} className="opacity-90 text-white" />;
-      if (area === "cirurgia") return <Scissors size={13} className="opacity-90 text-white" />;
-      if (area === "urgencia") return <Activity size={13} className="opacity-90 text-white animate-pulse" />;
-      if (area === "preventiva") return <ShieldAlert size={13} className="opacity-90 text-slate-800" />;
+      if (area === "clinica") return <Stethoscope size={12} className="opacity-90 text-white" />;
+      if (area === "cirurgia") return <Scissors size={12} className="opacity-90 text-white" />;
+      if (area === "urgencia") return <Activity size={12} className="opacity-90 text-white" />;
+      if (area === "preventiva") return <ShieldAlert size={12} className="opacity-90 text-slate-700" />;
       return null;
   }
 };
@@ -64,147 +64,112 @@ export const Board: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
-  // Calcula escala responsiva para caber todo o tabuleiro de 1200x900
+  // Auto-scale to fit parent container
   useEffect(() => {
     const handleResize = () => {
       if (!containerRef.current) return;
-      const containerW = containerRef.current.clientWidth;
-      const containerH = containerRef.current.clientHeight;
-      const scaleX = containerW / 1200;
-      const scaleY = containerH / 900;
-      setScale(Math.min(scaleX, scaleY));
+      const parent = containerRef.current.parentElement;
+      if (!parent) return;
+      const containerW = parent.clientWidth;
+      const containerH = parent.clientHeight;
+      const scaleX = containerW / 1050;
+      const scaleY = containerH / 1050;
+      setScale(Math.min(scaleX, scaleY, 1));
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const observer = new ResizeObserver(handleResize);
+    if (containerRef.current?.parentElement) {
+      observer.observe(containerRef.current.parentElement);
+    }
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
   }, []);
 
-  // Renderiza decorações de fundo lúdicas
-  const renderDecorations = () => {
-    return (
-      <g id="decorations" className="pointer-events-none select-none">
-        {/* UPA */}
-        <g opacity="0.35" transform="translate(140, 810)">
-          <rect x="-60" y="-16" width="120" height="32" rx="16" fill="#EFF6FF" stroke="#BFDBFE" strokeWidth="1.5" />
-          <text x="0" y="5" textAnchor="middle" fill="#2563EB" className="text-xs font-black tracking-widest uppercase">🚑 UPA</text>
-        </g>
-
-        {/* Consultórios */}
-        <g opacity="0.35" transform="translate(840, 810)">
-          <rect x="-80" y="-16" width="160" height="32" rx="16" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1.5" />
-          <text x="0" y="5" textAnchor="middle" fill="#16A34A" className="text-xs font-black tracking-widest uppercase">🩺 CONSULTÓRIOS</text>
-        </g>
-
-        {/* Enfermaria */}
-        <g opacity="0.35" transform="translate(480, 700)">
-          <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#FDF4FF" stroke="#F5D0FE" strokeWidth="1.5" />
-          <text x="0" y="5" textAnchor="middle" fill="#D946EF" className="text-xs font-black tracking-widest uppercase">🛏️ ENFERMARIA</text>
-        </g>
-
-        {/* Hospital Central */}
-        <g opacity="0.45" transform="translate(480, 560)">
-          <rect x="-100" y="-18" width="200" height="36" rx="18" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="2" />
-          <text x="0" y="5" textAnchor="middle" fill="#475569" className="text-sm font-black tracking-widest uppercase">🏢 HOSPITAL CENTRAL</text>
-        </g>
-
-        {/* UTI */}
-        <g opacity="0.35" transform="translate(740, 310)">
-          <rect x="-70" y="-16" width="140" height="32" rx="16" fill="#FFF5F5" stroke="#FEB2B2" strokeWidth="1.5" />
-          <text x="0" y="5" textAnchor="middle" fill="#E53E3E" className="text-xs font-black tracking-widest uppercase">🚨 UTI ADULTO</text>
-        </g>
-
-        {/* Centro Cirúrgico */}
-        <g opacity="0.35" transform="translate(240, 310)">
-          <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#F0FDFA" stroke="#99F6E4" strokeWidth="1.5" />
-          <text x="0" y="5" textAnchor="middle" fill="#0D9488" className="text-xs font-black tracking-widest uppercase">🥼 BLOC CIRÚRGICO</text>
-        </g>
-
-        {/* Emergência */}
-        <g opacity="0.35" transform="translate(240, 100)">
-          <rect x="-95" y="-16" width="190" height="32" rx="16" fill="#FFF7ED" stroke="#FED7AA" strokeWidth="1.5" />
-          <text x="0" y="5" textAnchor="middle" fill="#EA580C" className="text-xs font-black tracking-widest uppercase">⚡ SALA DE EMERGÊNCIA</text>
-        </g>
-      </g>
-    );
-  };
-
-  // Renderiza as conexões como uma "estrada" larga, colorida e contínua
-  const renderPathLines = () => {
+  // Render soft, curved path connections
+  const renderPaths = () => {
     const lines: React.ReactNode[] = [];
+    const drawn = new Set<string>();
     
     board.forEach((cell) => {
       if (!cell.next) return;
       
       cell.next.forEach((nextId) => {
+        const key = `${Math.min(cell.id, nextId)}-${Math.max(cell.id, nextId)}`;
+        if (drawn.has(key)) return;
+        drawn.add(key);
+
         const targetCell = board.find((c) => c.id === nextId);
         if (!targetCell) return;
 
-        const x1 = cell.position.x * 12; // Mapeia 0-100 para 0-1200
-        const y1 = cell.position.y * 9;  // Mapeia 0-100 para 0-900
-        const x2 = targetCell.position.x * 12;
-        const y2 = targetCell.position.y * 9;
+        const x1 = cell.position.x * 10;
+        const y1 = cell.position.y * 10;
+        const x2 = targetCell.position.x * 10;
+        const y2 = targetCell.position.y * 10;
 
         const isShortcut = cell.pathGroup === "shortcut" || targetCell.pathGroup === "shortcut";
         const isLong = cell.pathGroup === "long" || targetCell.pathGroup === "long";
         
-        let roadColor = "#F1F5F9"; // Cor do piso comum (Slate 100)
-        let borderColor = "#CBD5E1"; // Borda cinza sutil (Slate 300)
+        let roadColor = "#E2E8F0";
+        let borderColor = "#CBD5E1";
 
         if (isShortcut) {
-          roadColor = "#E0F2FE"; // Sky 100 para atalhos
-          borderColor = "#BAE6FD";
+          roadColor = "#DBEAFE";
+          borderColor = "#93C5FD";
         } else if (isLong) {
-          roadColor = "#F5F3FF"; // Purple 50 para caminhos longos
-          borderColor = "#DDD6FE";
+          roadColor = "#EDE9FE";
+          borderColor = "#C4B5FD";
         }
 
+        // Small curve for organic feel
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        const curveAmt = Math.min(len * 0.08, 12);
+        const cx = mx + (-dy / len) * curveAmt;
+        const cy = my + (dx / len) * curveAmt;
+
+        const pathD = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
+
         lines.push(
-          <g key={`path-${cell.id}-${targetCell.id}`}>
-            {/* 1. Sombra da estrada */}
-            <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="rgba(0, 0, 0, 0.03)"
-              strokeWidth={38}
+          <g key={`path-${cell.id}-${nextId}`}>
+            {/* Shadow */}
+            <path
+              d={pathD}
+              fill="none"
+              stroke="rgba(0, 0, 0, 0.04)"
+              strokeWidth={28}
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
-            {/* 2. Borda externa do piso */}
-            <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
+            {/* Border */}
+            <path
+              d={pathD}
+              fill="none"
               stroke={borderColor}
-              strokeWidth={30}
+              strokeWidth={22}
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
-            {/* 3. Corpo interno do piso (pista contínua) */}
-            <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
+            {/* Road body */}
+            <path
+              d={pathD}
+              fill="none"
               stroke={roadColor}
-              strokeWidth={24}
+              strokeWidth={16}
               strokeLinecap="round"
-              strokeLinejoin="round"
             />
-            {/* 4. Linha tracejada central lúdica */}
-            <line
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#FFFFFF"
+            {/* Center dashes */}
+            <path
+              d={pathD}
+              fill="none"
+              stroke="rgba(255,255,255,0.8)"
               strokeWidth={1.5}
               strokeLinecap="round"
-              strokeDasharray="4 8"
-              className="opacity-95"
+              strokeDasharray="3 7"
             />
           </g>
         );
@@ -214,7 +179,7 @@ export const Board: React.FC = () => {
     return lines;
   };
 
-  // Renderiza as casas do tabuleiro
+  // Render board cells
   const renderCells = () => {
     const { choosePath } = useGameStore.getState();
     const activeTeam = teams[currentTeamIndex];
@@ -224,14 +189,14 @@ export const Board: React.FC = () => {
     const selectableCellIds = activeCell?.next && activeCell.next.length > 1 ? activeCell.next : [];
 
     return board.map((cell) => {
-      const x = cell.position.x * 12;
-      const y = cell.position.y * 9;
+      const x = cell.position.x * 10;
+      const y = cell.position.y * 10;
       
       const isStart = cell.id === 0;
       const isFinal = cell.id === 50;
       const isSelectable = isPathChoice && selectableCellIds.includes(cell.id);
       
-      // Cor de preenchimento e tipo
+      // Color
       let color = areaColors.start;
       if (isFinal) color = areaColors.final;
       else if (cell.specialEffect === "curinga") color = areaColors.curinga;
@@ -239,65 +204,54 @@ export const Board: React.FC = () => {
       else if (cell.area) color = areaColors[cell.area];
 
       const isSpecial = !!cell.specialEffect;
-      const r = isStart || isFinal ? 28 : (isSpecial ? 23 : 19);
+      const r = isStart || isFinal ? 24 : (isSpecial ? 20 : 16);
 
       return (
         <g 
           key={`cell-${cell.id}`} 
-          className={`group ${isSelectable ? "cursor-pointer animate-pulse-slow" : "cursor-default"}`}
+          className={`group ${isSelectable ? "cursor-pointer" : "cursor-default"}`}
           onClick={() => {
             if (isSelectable) {
               choosePath(cell.id);
             }
           }}
         >
-          {/* Anelação pulsante rosa se a casa puder ser selecionada na bifurcação */}
+          {/* Selectable glow - soft drop shadow, no ring */}
           {isSelectable && (
             <circle
               cx={x}
               cy={y}
-              r={r + 8}
+              r={r + 5}
               fill="none"
               stroke="#ec4899"
-              strokeWidth={3}
-              className="animate-pulse-ring pointer-events-none"
+              strokeWidth={2.5}
+              opacity={0.7}
+              className="animate-gentle-pulse pointer-events-none"
             />
           )}
 
-          {/* Anel Dourado para casas especiais */}
-          {isSpecial && !isSelectable && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r + 4}
-              fill="none"
-              stroke="#F59E0B"
-              strokeWidth={2}
-              className="animate-pulse-slow pointer-events-none"
-            />
-          )}
-
-          {/* Sombra de profundidade 3D da casa */}
-          <circle
+          {/* 3D shadow beneath cell */}
+          <ellipse
             cx={x}
             cy={y + 3}
-            r={r}
-            fill="rgba(0, 0, 0, 0.12)"
+            rx={r}
+            ry={r * 0.85}
+            fill="rgba(0, 0, 0, 0.1)"
             className="pointer-events-none"
           />
 
-          {/* Círculo principal colorido */}
+          {/* Main cell circle */}
           <circle
             cx={x}
             cy={y}
             r={r}
             fill={isSelectable ? "#ec4899" : color}
             stroke="#FFFFFF"
-            strokeWidth={3}
-            className="group-hover:brightness-105 transition-all duration-300"
+            strokeWidth={2.5}
+            className="transition-all duration-300"
           />
 
-          {/* Efeito Glossy 3D (Brilho Interno) */}
+          {/* Glossy highlight */}
           <circle
             cx={x}
             cy={y}
@@ -306,37 +260,51 @@ export const Board: React.FC = () => {
             className="pointer-events-none"
           />
 
-          {/* Ícone ou ID da casa */}
+          {/* Special cell subtle inner ring */}
+          {isSpecial && !isSelectable && (
+            <circle
+              cx={x}
+              cy={y}
+              r={r - 3}
+              fill="none"
+              stroke="rgba(255,255,255,0.35)"
+              strokeWidth={1}
+              strokeDasharray="3 3"
+              className="pointer-events-none"
+            />
+          )}
+
+          {/* Icon or ID */}
           <g transform={`translate(${x}, ${y})`}>
             {cell.specialEffect || (cell.type === "normal" && cell.area) ? (
-              <g transform={isSpecial ? "translate(-9, -9)" : "translate(-6.5, -6.5)"}>
+              <g transform={isSpecial ? "translate(-8, -8)" : "translate(-6, -6)"}>
                 {getEffectIcon(cell.specialEffect, cell.area)}
               </g>
             ) : null}
 
-            {/* Número da casa */}
-            {!isStart && !isFinal && !isSpecial && (
+            {/* Cell number */}
+            {!isStart && !isFinal && !isSpecial && !cell.area && (
               <text
                 x={0}
                 y={4}
                 textAnchor="middle"
-                fill={cell.area === "preventiva" ? "#1e293b" : "#ffffff"}
+                fill="#ffffff"
                 className="text-[10px] font-black select-none pointer-events-none"
               >
                 {cell.id}
               </text>
             )}
 
-            {/* Texto Início/Fim */}
+            {/* Start/End text */}
             {(isStart || isFinal) && (
               <text
                 x={0}
                 y={3}
                 textAnchor="middle"
                 fill="white"
-                className="text-[9px] font-black tracking-wider uppercase select-none pointer-events-none"
+                className="text-[8px] font-black tracking-wider uppercase select-none pointer-events-none"
               >
-                {isStart ? "Início" : "Final"}
+                {isStart ? "Início" : "🏆"}
               </text>
             )}
           </g>
@@ -347,14 +315,14 @@ export const Board: React.FC = () => {
     });
   };
 
-  // Renderiza os peões sobre as casas, simulando peças físicas 3D com bounce
+  // Render pawns as 3D game pieces
   const renderPawns = () => {
     return board.map((cell) => {
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
       if (teamsOnCell.length === 0) return null;
 
-      const cx = cell.position.x * 12;
-      const cy = cell.position.y * 9;
+      const cx = cell.position.x * 10;
+      const cy = cell.position.y * 10;
 
       return (
         <g key={`pawns-group-${cell.id}`}>
@@ -367,8 +335,8 @@ export const Board: React.FC = () => {
             let py = cy;
             
             if (count > 1) {
-              const angle = (index * 2 * Math.PI) / count;
-              const radius = 16;
+              const angle = (index * 2 * Math.PI) / count - Math.PI / 2;
+              const radius = 14;
               px = cx + Math.cos(angle) * radius;
               py = cy + Math.sin(angle) * radius;
             }
@@ -376,59 +344,47 @@ export const Board: React.FC = () => {
             return (
               <g
                 key={`pawn-${team.id}`}
-                className="transition-pawn-spring"
+                className="transition-pawn-hop"
                 style={{
                   transform: `translate(${px}px, ${py}px)`,
-                }}
+                  "--glow-color": `${team.color}90`,
+                } as React.CSSProperties}
               >
-                {/* Grupo com a base e o corpo que recebe o bounce de turno ativo */}
-                <g className={isActive ? "animate-pawn-bounce" : ""}>
-                  {/* Sombra oval do peão na base */}
+                {/* Pawn group with float animation for active */}
+                <g className={isActive ? "animate-pawn-float animate-glow-pulse" : ""}>
+                  {/* Base shadow */}
                   <ellipse
                     cx={0}
-                    cy={15}
-                    rx={11}
-                    ry={3.5}
-                    fill="rgba(0, 0, 0, 0.22)"
+                    cy={13}
+                    rx={9}
+                    ry={3}
+                    fill="rgba(0, 0, 0, 0.18)"
                     className="pointer-events-none"
                   />
 
-                  {/* Corpo do Peão (Bolinha com volume e borda branca) */}
+                  {/* Pawn body */}
                   <circle
                     cx={0}
                     cy={0}
-                    r={16}
+                    r={13}
                     fill={team.color}
                     stroke="#FFFFFF"
-                    strokeWidth={2.5}
+                    strokeWidth={2}
                     className="pointer-events-none"
                   />
 
-                  {/* Efeito Glossy 3D de plástico */}
+                  {/* Glossy effect */}
                   <circle
                     cx={0}
                     cy={0}
-                    r={16}
+                    r={13}
                     fill="url(#pawnGlossy)"
                     className="pointer-events-none"
                   />
 
-                  {/* Anelação pulsante de borda se for a equipe ativa */}
-                  {isActive && (
-                    <circle
-                      cx={0}
-                      cy={0}
-                      r={19}
-                      fill="none"
-                      stroke={team.color}
-                      strokeWidth={2}
-                      className="animate-pulse-ring pointer-events-none"
-                    />
-                  )}
-
-                  {/* Ícone do Peão no Centro */}
-                  <g transform="translate(-8, -8)" className="text-white pointer-events-none">
-                    <PawnIcon type={team.pawn} size={16} />
+                  {/* Pawn icon */}
+                  <g transform="translate(-7, -7)" className="text-white pointer-events-none">
+                    <PawnIcon type={team.pawn} size={14} />
                   </g>
                 </g>
 
@@ -441,80 +397,111 @@ export const Board: React.FC = () => {
     });
   };
 
+  // Fun decorative elements
+  const renderDecorations = () => {
+    return (
+      <g id="decorations" className="pointer-events-none select-none" opacity={0.15}>
+        {/* Scattered medical emojis as fun decoration */}
+        <text x="150" y="450" fontSize="28">🩺</text>
+        <text x="850" y="500" fontSize="24">💉</text>
+        <text x="500" y="150" fontSize="22">🏥</text>
+        <text x="700" y="650" fontSize="20">🧬</text>
+        <text x="300" y="700" fontSize="22">💊</text>
+        <text x="900" y="250" fontSize="20">🔬</text>
+        <text x="100" y="200" fontSize="24">❤️</text>
+        <text x="600" y="800" fontSize="20">🩹</text>
+      </g>
+    );
+  };
+
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-[500px] md:h-[650px] rounded-[32px] bg-gradient-to-b from-slate-50 to-slate-100 border-4 border-white overflow-hidden flex items-center justify-center shadow-lg shadow-slate-200/50"
+      className="relative w-full h-full rounded-3xl overflow-hidden flex items-center justify-center"
+      style={{
+        background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 40%, #eef2ff 100%)",
+        border: "3px solid rgba(255,255,255,0.9)",
+        boxShadow: "0 8px 32px -8px rgba(100, 116, 139, 0.15), inset 0 1px 0 rgba(255,255,255,0.8)"
+      }}
     >
-      {/* Grid de fundo lúdico */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] bg-[size:20px_20px] pointer-events-none opacity-60" />
+      {/* Subtle dot grid background */}
+      <div className="absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] bg-[size:18px_18px] pointer-events-none opacity-30" />
+      
+      {/* Soft gradient overlay */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(248,250,252,0.4) 100%)"
+      }} />
 
-      {/* Container escalado responsivamente */}
+      {/* Scaled SVG container */}
       <div
         style={{
-          width: "1200px",
-          height: "900px",
+          width: "1050px",
+          height: "1050px",
           transform: `scale(${scale})`,
           transformOrigin: "center center",
           flexShrink: 0
         }}
-        className="relative select-none transition-transform duration-300 ease-out"
+        className="relative select-none"
       >
         <svg
-          viewBox="0 0 1200 900"
+          viewBox="0 0 1000 1000"
           className="w-full h-full"
+          style={{ overflow: "visible" }}
         >
           <defs>
-            {/* Gradiente 3D para os peões */}
-            <radialGradient id="pawnGlossy" cx="30%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
-              <stop offset="45%" stopColor="#ffffff" stopOpacity="0.0" />
-              <stop offset="90%" stopColor="#000000" stopOpacity="0.35" />
+            {/* Pawn glossy gradient */}
+            <radialGradient id="pawnGlossy" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
+              <stop offset="40%" stopColor="#ffffff" stopOpacity="0.0" />
+              <stop offset="95%" stopColor="#000000" stopOpacity="0.25" />
             </radialGradient>
             
-            {/* Gradiente 3D para as casas */}
-            <radialGradient id="cellGlossy" cx="30%" cy="30%" r="70%">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
-              <stop offset="50%" stopColor="#ffffff" stopOpacity="0.0" />
-              <stop offset="100%" stopColor="#000000" stopOpacity="0.15" />
+            {/* Cell glossy gradient */}
+            <radialGradient id="cellGlossy" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
+              <stop offset="45%" stopColor="#ffffff" stopOpacity="0.0" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="0.1" />
             </radialGradient>
           </defs>
 
-          {/* 1. Decorações de Fundo */}
+          {/* 1. Fun decorations */}
           {renderDecorations()}
 
-          {/* 2. Conexões (Estrada) */}
-          {renderPathLines()}
+          {/* 2. Path connections */}
+          {renderPaths()}
 
-          {/* 3. Casas do tabuleiro */}
+          {/* 3. Board cells */}
           {renderCells()}
 
-          {/* 4. Peões */}
+          {/* 4. Pawns */}
           {renderPawns()}
         </svg>
       </div>
 
-      {/* Legenda de Áreas em badge flutuante */}
-      <div className="absolute bottom-4 left-4 right-4 md:right-auto bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl flex flex-wrap gap-3 text-xs border border-slate-200 pointer-events-none shadow-md">
+      {/* Legend badge */}
+      <div className="absolute bottom-3 left-3 right-3 md:right-auto bg-white/90 backdrop-blur-md px-3 py-2 rounded-xl flex flex-wrap gap-2.5 text-[10px] border border-slate-200/70 pointer-events-none shadow-sm">
         {Object.entries(areaColors).map(([area, color]) => {
           if (["special", "start", "final"].includes(area)) return null;
           
-          let name = "";
-          if (area === "clinica") name = "Clínica";
-          else if (area === "cirurgia") name = "Cirurgia";
-          else if (area === "pediatria") name = "Pediatria";
-          else if (area === "go") name = "G.O.";
-          else if (area === "preventiva") name = "Preventiva";
-          else if (area === "urgencia") name = "Urgência";
-          else if (area === "curinga") name = "Curinga";
+          const names: Record<string, string> = {
+            clinica: "Clínica",
+            cirurgia: "Cirurgia",
+            pediatria: "Pediatria",
+            go: "G.O.",
+            preventiva: "Preventiva",
+            urgencia: "Urgência",
+            curinga: "Curinga"
+          };
+          const name = names[area];
+          if (!name) return null;
 
           return (
-            <div key={area} className="flex items-center gap-1.5">
+            <div key={area} className="flex items-center gap-1">
               <span
-                className="w-3.5 h-3.5 rounded-full border border-white shadow-sm"
+                className="w-3 h-3 rounded-full border border-white/80 shadow-sm"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-slate-600 font-extrabold">{name}</span>
+              <span className="text-slate-500 font-bold">{name}</span>
             </div>
           );
         })}
