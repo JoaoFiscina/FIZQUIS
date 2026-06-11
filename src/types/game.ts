@@ -75,6 +75,7 @@ export type GamePhase =
   | "choosing_path"
   | "choosing_target"
   | "choosing_area"
+  | "revealing_cell"
   | "answering"
   | "resolving"
   | "game_over";

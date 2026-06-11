@@ -90,3 +90,38 @@
   animation: pulse-slow 3s infinite ease-in-out;
 }
 
+@keyframes pawnBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-pawn-bounce {
+  animation: pawnBounce 1.4s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out forwards;
+}
+
+@keyframes scale-up {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-up {
+  animation: scale-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.transition-pawn-spring {
+  transition: transform 550ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+

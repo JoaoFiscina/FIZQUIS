@@ -41,7 +41,30 @@ interface GameState {
   selectTrocaLeitoTarget: (targetTeamId: string) => void;
   resetGame: () => void;
   addLog: (text: string, type: GameLogEntry["type"]) => void;
+  completeReveal: () => void;
+  animateReturnToOrigin: (targetPosition: number) => Promise<void>;
 }
+
+const getPreviousCellId = (currentId: number, origin: number): number => {
+  if (currentId === 0) return 0;
+  if (currentId === 201) return 12;
+  if (currentId >= 202 && currentId <= 210) return currentId - 1;
+  if (currentId === 23) {
+    return (origin >= 201 && origin <= 210) ? 210 : 18;
+  }
+  if (currentId === 13) return 12;
+  if (currentId >= 14 && currentId <= 18) return currentId - 1;
+  
+  if (currentId === 301) return 30;
+  if (currentId >= 302 && currentId <= 307) return currentId - 1;
+  if (currentId === 40) {
+    return (origin >= 301 && origin <= 307) ? 307 : 33;
+  }
+  if (currentId === 31) return 30;
+  if (currentId >= 32 && currentId <= 33) return currentId - 1;
+  
+  return currentId - 1;
+};
 
 const getRandomArea = (): MedicalArea => {
   const areas: MedicalArea[] = ["clinica", "cirurgia", "pediatria", "go", "preventiva", "urgencia"];
@@ -178,7 +201,7 @@ export const useGameStore = create<GameState>()(
             get().addLog(`${activeTeam.name} chegou ao Plantão Final! Pergunta Decisiva à vista!`, "system");
             set({
               activeQuestion: question,
-              phase: "answering",
+              phase: "revealing_cell",
               eliminatedOptions: []
             });
             return;
@@ -186,7 +209,11 @@ export const useGameStore = create<GameState>()(
 
           // Se cair em casa curinga
           if (destinationCell.specialEffect === "curinga") {
-            set({ phase: "choosing_area" });
+            set({
+              activeQuestion: undefined,
+              phase: "revealing_cell",
+              eliminatedOptions: []
+            });
             return;
           }
 
@@ -198,7 +225,7 @@ export const useGameStore = create<GameState>()(
 
           set({
             activeQuestion: question,
-            phase: "answering",
+            phase: "revealing_cell",
             eliminatedOptions: []
           });
           return;
@@ -227,8 +254,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 300ms por casa para animação
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // Atraso de 500ms por casa para animação (pulos lentos e visíveis)
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Recursão
         await get().moveActiveTeam(stepsLeft - 1);
@@ -516,50 +543,77 @@ export const useGameStore = create<GameState>()(
           }
         }
 
-        // Aplica posições e modificadores básicos
-        let updatedTeams = state.teams.map((t, idx) => {
-          if (idx === state.currentTeamIndex) {
-            return {
-              ...t,
-              position: finalPosition,
-              skipNextTurn: t.skipNextTurn || skipTurn
-            };
+        if (isCorrect) {
+          // Aplica posições e modificadores básicos apenas se acertou
+          let updatedTeams = state.teams.map((t, idx) => {
+            if (idx === state.currentTeamIndex) {
+              return {
+                ...t,
+                position: finalPosition,
+                skipNextTurn: t.skipNextTurn || skipTurn
+              };
+            }
+            return t;
+          });
+
+          set({
+            teams: updatedTeams,
+            activeQuestion: undefined,
+            selectedCell: undefined
+          });
+
+          // Se precisa de escolha de alvo (Intercorrência, Contra-referência, Troca de Leito)
+          if (selectTarget || selectTroca) {
+            set({ phase: "choosing_target" });
+            return;
           }
-          return t;
-        });
 
-        set({
-          teams: updatedTeams,
-          activeQuestion: undefined,
-          selectedCell: undefined
-        });
+          // Se tem movimento de bônus por acerto (Evolução Perfeita, Plantão Caótico, Risco Cirúrgico, R3)
+          if (isCorrectBonusMovement && bonusSteps > 0) {
+            set({
+              phase: "moving",
+              isMoving: true
+            });
+            await get().moveActiveTeam(bonusSteps);
+            return;
+          }
 
-        // Se precisa de escolha de alvo (Intercorrência, Contra-referência, Troca de Leito)
-        if (selectTarget || selectTroca) {
-          set({ phase: "choosing_target" });
-          return;
-        }
+          // Finaliza o turno e passa para a próxima equipe
+          const nextTeamIndex = get().extraTurnActive
+            ? state.currentTeamIndex // Mantém a vez se ativou extraTurnActive
+            : (state.currentTeamIndex + 1) % state.teams.length;
 
-        // Se tem movimento de bônus por acerto (Evolução Perfeita, Plantão Caótico, Risco Cirúrgico, R3)
-        if (isCorrectBonusMovement && bonusSteps > 0) {
+          set({
+            phase: "waiting_roll",
+            extraTurnActive: false,
+            currentTeamIndex: nextTeamIndex
+          });
+        } else {
+          // --- SE ERROU ---
+          // Aplica modificadores (como skipNextTurn) mas NÃO a posição final imediata (será animada de volta)
+          let updatedTeams = state.teams.map((t, idx) => {
+            if (idx === state.currentTeamIndex) {
+              return {
+                ...t,
+                skipNextTurn: t.skipNextTurn || skipTurn
+              };
+            }
+            return t;
+          });
+
+          set({
+            teams: updatedTeams,
+            activeQuestion: undefined,
+            selectedCell: undefined
+          });
+
+          // Inicia a movimentação de volta
           set({
             phase: "moving",
             isMoving: true
           });
-          await get().moveActiveTeam(bonusSteps);
-          return;
+          await get().animateReturnToOrigin(finalPosition);
         }
-
-        // Finaliza o turno e passa para a próxima equipe
-        const nextTeamIndex = get().extraTurnActive
-          ? state.currentTeamIndex // Mantém a vez se ativou extraTurnActive
-          : (state.currentTeamIndex + 1) % state.teams.length;
-
-        set({
-          phase: "waiting_roll",
-          extraTurnActive: false,
-          currentTeamIndex: nextTeamIndex
-        });
       },
 
       selectInteractionTarget: (targetTeamId) => {
@@ -648,6 +702,53 @@ export const useGameStore = create<GameState>()(
           passPlantaoTargetTeamId: undefined,
           isMoving: false
         });
+      },
+
+      completeReveal: () => {
+        const state = get();
+        if (state.phase !== "revealing_cell" || !state.selectedCell) return;
+
+        if (state.selectedCell.specialEffect === "curinga") {
+          set({ phase: "choosing_area" });
+        } else {
+          set({ phase: "answering" });
+        }
+      },
+
+      animateReturnToOrigin: async (targetPosition: number) => {
+        const state = get();
+        const activeTeam = state.teams[state.currentTeamIndex];
+
+        if (activeTeam.position === targetPosition) {
+          set({ isMoving: false });
+
+          // Finaliza o turno e passa para a próxima equipe
+          const nextTeamIndex = state.extraTurnActive
+            ? state.currentTeamIndex
+            : (state.currentTeamIndex + 1) % state.teams.length;
+
+          set({
+            phase: "waiting_roll",
+            extraTurnActive: false,
+            currentTeamIndex: nextTeamIndex
+          });
+          return;
+        }
+
+        // Determina a posição anterior
+        const prevId = getPreviousCellId(activeTeam.position, state.originPosition ?? 0);
+
+        const updatedTeams = state.teams.map((t, idx) =>
+          idx === state.currentTeamIndex ? { ...t, position: prevId } : t
+        );
+
+        set({ teams: updatedTeams });
+
+        // Atraso de 400ms por casa
+        await new Promise((resolve) => setTimeout(resolve, 400));
+
+        // Recursão
+        await get().animateReturnToOrigin(targetPosition);
       }
     }),
     {

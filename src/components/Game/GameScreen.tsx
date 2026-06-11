@@ -6,6 +6,7 @@ import { GameLog } from "./GameLog";
 import { QuestionModal } from "../Questions/QuestionModal";
 import { AreaSelector } from "../Questions/AreaSelector";
 import { TargetSelectionModal } from "./TargetSelectionModal";
+import { CellRevealCard } from "./CellRevealCard";
 import { PawnIcon } from "../Board/PawnIcon";
 import { RefreshCw, VolumeX } from "lucide-react";
 
@@ -34,6 +35,7 @@ export const GameScreen: React.FC = () => {
       <QuestionModal />
       <AreaSelector />
       <TargetSelectionModal />
+      {phase === "revealing_cell" && <CellRevealCard />}
 
       {/* Header do Jogo */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-4 md:px-6 rounded-2xl border border-slate-100 shadow-sm">

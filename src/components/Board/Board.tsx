@@ -21,20 +21,19 @@ import {
 } from "lucide-react";
 import type { SpecialEffectType } from "../../types/game";
 
-// Auxiliar para obter ícones de efeitos especiais das casas
 const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
   const size = 18;
   switch (effect) {
     case "curinga":
       return <HelpCircle size={size} className="text-white" />;
     case "plantao_tranquilo":
-      return <RotateCcw size={size} className="text-white animate-spin-slow" />;
+      return <RotateCcw size={size} className="text-white" />;
     case "evolucao_perfeita":
       return <Zap size={size} className="text-white animate-bounce" />;
     case "alta_hospitalar":
       return <CheckCircle size={size} className="text-white" />;
     case "dupla_checagem":
-      return <Zap size={size} className="text-white" />; // Reaproveitando Zap ou similar
+      return <Zap size={size} className="text-white" />;
     case "plantao_caotico":
       return <AlertTriangle size={size} className="text-white" />;
     case "caso_grave":
@@ -52,10 +51,9 @@ const getEffectIcon = (effect?: SpecialEffectType, area?: string) => {
     case "contra_referencia":
       return <CornerDownLeft size={size} className="text-white" />;
     default:
-      // Se for casa normal sem efeito, pode mostrar estetoscópio ou cirurgia dependendo da área
       if (area === "clinica") return <Stethoscope size={13} className="opacity-90 text-white" />;
       if (area === "cirurgia") return <Scissors size={13} className="opacity-90 text-white" />;
-      if (area === "urgencia") return <Activity size={13} className="opacity-90 text-white" />;
+      if (area === "urgencia") return <Activity size={13} className="opacity-90 text-white animate-pulse" />;
       if (area === "preventiva") return <ShieldAlert size={13} className="opacity-90 text-slate-800" />;
       return null;
   }
@@ -74,7 +72,6 @@ export const Board: React.FC = () => {
       const containerH = containerRef.current.clientHeight;
       const scaleX = containerW / 1200;
       const scaleY = containerH / 900;
-      // Usamos a menor escala para garantir que o tabuleiro caiba inteiro sem scroll
       setScale(Math.min(scaleX, scaleY));
     };
 
@@ -83,7 +80,56 @@ export const Board: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Renderiza as conexões como uma "estrada" larga e contínua
+  // Renderiza decorações de fundo lúdicas
+  const renderDecorations = () => {
+    return (
+      <g id="decorations" className="pointer-events-none select-none">
+        {/* UPA */}
+        <g opacity="0.35" transform="translate(140, 810)">
+          <rect x="-60" y="-16" width="120" height="32" rx="16" fill="#EFF6FF" stroke="#BFDBFE" strokeWidth="1.5" />
+          <text x="0" y="5" textAnchor="middle" fill="#2563EB" className="text-xs font-black tracking-widest uppercase">🚑 UPA</text>
+        </g>
+
+        {/* Consultórios */}
+        <g opacity="0.35" transform="translate(840, 810)">
+          <rect x="-80" y="-16" width="160" height="32" rx="16" fill="#F0FDF4" stroke="#BBF7D0" strokeWidth="1.5" />
+          <text x="0" y="5" textAnchor="middle" fill="#16A34A" className="text-xs font-black tracking-widest uppercase">🩺 CONSULTÓRIOS</text>
+        </g>
+
+        {/* Enfermaria */}
+        <g opacity="0.35" transform="translate(480, 700)">
+          <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#FDF4FF" stroke="#F5D0FE" strokeWidth="1.5" />
+          <text x="0" y="5" textAnchor="middle" fill="#D946EF" className="text-xs font-black tracking-widest uppercase">🛏️ ENFERMARIA</text>
+        </g>
+
+        {/* Hospital Central */}
+        <g opacity="0.45" transform="translate(480, 560)">
+          <rect x="-100" y="-18" width="200" height="36" rx="18" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="2" />
+          <text x="0" y="5" textAnchor="middle" fill="#475569" className="text-sm font-black tracking-widest uppercase">🏢 HOSPITAL CENTRAL</text>
+        </g>
+
+        {/* UTI */}
+        <g opacity="0.35" transform="translate(740, 310)">
+          <rect x="-70" y="-16" width="140" height="32" rx="16" fill="#FFF5F5" stroke="#FEB2B2" strokeWidth="1.5" />
+          <text x="0" y="5" textAnchor="middle" fill="#E53E3E" className="text-xs font-black tracking-widest uppercase">🚨 UTI ADULTO</text>
+        </g>
+
+        {/* Centro Cirúrgico */}
+        <g opacity="0.35" transform="translate(240, 310)">
+          <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#F0FDFA" stroke="#99F6E4" strokeWidth="1.5" />
+          <text x="0" y="5" textAnchor="middle" fill="#0D9488" className="text-xs font-black tracking-widest uppercase">🥼 BLOC CIRÚRGICO</text>
+        </g>
+
+        {/* Emergência */}
+        <g opacity="0.35" transform="translate(240, 100)">
+          <rect x="-95" y="-16" width="190" height="32" rx="16" fill="#FFF7ED" stroke="#FED7AA" strokeWidth="1.5" />
+          <text x="0" y="5" textAnchor="middle" fill="#EA580C" className="text-xs font-black tracking-widest uppercase">⚡ SALA DE EMERGÊNCIA</text>
+        </g>
+      </g>
+    );
+  };
+
+  // Renderiza as conexões como uma "estrada" larga, colorida e contínua
   const renderPathLines = () => {
     const lines: React.ReactNode[] = [];
     
@@ -102,27 +148,42 @@ export const Board: React.FC = () => {
         const isShortcut = cell.pathGroup === "shortcut" || targetCell.pathGroup === "shortcut";
         const isLong = cell.pathGroup === "long" || targetCell.pathGroup === "long";
         
-        let roadColor = "#E2E8F0"; // Pista cinza padrão
+        let roadColor = "#F1F5F9"; // Cor do piso comum (Slate 100)
+        let borderColor = "#CBD5E1"; // Borda cinza sutil (Slate 300)
 
         if (isShortcut) {
-          roadColor = "#CFFAFE"; // Azul ciano claro para atalhos
+          roadColor = "#E0F2FE"; // Sky 100 para atalhos
+          borderColor = "#BAE6FD";
         } else if (isLong) {
-          roadColor = "#E0F2FE"; // Azul muito claro para rotas mais longas
+          roadColor = "#F5F3FF"; // Purple 50 para caminhos longos
+          borderColor = "#DDD6FE";
         }
 
         lines.push(
           <g key={`path-${cell.id}-${targetCell.id}`}>
-            {/* Sombra da estrada */}
+            {/* 1. Sombra da estrada */}
             <line
               x1={x1}
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke="rgba(0, 0, 0, 0.04)"
-              strokeWidth={32}
+              stroke="rgba(0, 0, 0, 0.03)"
+              strokeWidth={38}
               strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            {/* Corpo da pista */}
+            {/* 2. Borda externa do piso */}
+            <line
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke={borderColor}
+              strokeWidth={30}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* 3. Corpo interno do piso (pista contínua) */}
             <line
               x1={x1}
               y1={y1}
@@ -131,18 +192,19 @@ export const Board: React.FC = () => {
               stroke={roadColor}
               strokeWidth={24}
               strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            {/* Linha tracejada central lúdica */}
+            {/* 4. Linha tracejada central lúdica */}
             <line
               x1={x1}
               y1={y1}
               x2={x2}
               y2={y2}
               stroke="#FFFFFF"
-              strokeWidth={2}
+              strokeWidth={1.5}
               strokeLinecap="round"
-              strokeDasharray="6 6"
-              className="opacity-70"
+              strokeDasharray="4 8"
+              className="opacity-95"
             />
           </g>
         );
@@ -169,16 +231,20 @@ export const Board: React.FC = () => {
       const isFinal = cell.id === 50;
       const isSelectable = isPathChoice && selectableCellIds.includes(cell.id);
       
-      // Cor de preenchimento e borda
+      // Cor de preenchimento e tipo
       let color = areaColors.start;
       if (isFinal) color = areaColors.final;
+      else if (cell.specialEffect === "curinga") color = areaColors.curinga;
       else if (cell.specialEffect) color = areaColors.special;
       else if (cell.area) color = areaColors[cell.area];
+
+      const isSpecial = !!cell.specialEffect;
+      const r = isStart || isFinal ? 28 : (isSpecial ? 23 : 19);
 
       return (
         <g 
           key={`cell-${cell.id}`} 
-          className={`group ${isSelectable ? "cursor-pointer" : "cursor-default"}`}
+          className={`group ${isSelectable ? "cursor-pointer animate-pulse-slow" : "cursor-default"}`}
           onClick={() => {
             if (isSelectable) {
               choosePath(cell.id);
@@ -190,59 +256,72 @@ export const Board: React.FC = () => {
             <circle
               cx={x}
               cy={y}
-              r={28}
+              r={r + 8}
               fill="none"
               stroke="#ec4899"
               strokeWidth={3}
-              className="animate-pulse-ring"
+              className="animate-pulse-ring pointer-events-none"
             />
           )}
 
-          {/* Sombra suave de profundidade */}
+          {/* Anel Dourado para casas especiais */}
+          {isSpecial && !isSelectable && (
+            <circle
+              cx={x}
+              cy={y}
+              r={r + 4}
+              fill="none"
+              stroke="#F59E0B"
+              strokeWidth={2}
+              className="animate-pulse-slow pointer-events-none"
+            />
+          )}
+
+          {/* Sombra de profundidade 3D da casa */}
           <circle
             cx={x}
-            cy={y + 2}
-            r={isStart || isFinal ? 28 : 22}
-            fill="rgba(0, 0, 0, 0.15)"
+            cy={y + 3}
+            r={r}
+            fill="rgba(0, 0, 0, 0.12)"
             className="pointer-events-none"
           />
 
-          {/* Círculo Principal colorido */}
+          {/* Círculo principal colorido */}
           <circle
             cx={x}
             cy={y}
-            r={isStart || isFinal ? 28 : 22}
+            r={r}
             fill={isSelectable ? "#ec4899" : color}
             stroke="#FFFFFF"
             strokeWidth={3}
             className="group-hover:brightness-105 transition-all duration-300"
           />
 
-          {/* Brilho interno em degradê sutil */}
+          {/* Efeito Glossy 3D (Brilho Interno) */}
           <circle
             cx={x}
             cy={y}
-            r={isStart || isFinal ? 24 : 18}
-            fill="#FFFFFF"
-            className="opacity-15 pointer-events-none"
+            r={r}
+            fill="url(#cellGlossy)"
+            className="pointer-events-none"
           />
 
           {/* Ícone ou ID da casa */}
           <g transform={`translate(${x}, ${y})`}>
-            {cell.specialEffect || cell.type === "normal" && cell.area ? (
-              <g transform="translate(-9, -9)">
+            {cell.specialEffect || (cell.type === "normal" && cell.area) ? (
+              <g transform={isSpecial ? "translate(-9, -9)" : "translate(-6.5, -6.5)"}>
                 {getEffectIcon(cell.specialEffect, cell.area)}
               </g>
             ) : null}
 
             {/* Número da casa */}
-            {!isStart && !isFinal && !cell.specialEffect && (
+            {!isStart && !isFinal && !isSpecial && (
               <text
                 x={0}
                 y={4}
                 textAnchor="middle"
                 fill={cell.area === "preventiva" ? "#1e293b" : "#ffffff"}
-                className="text-[10px] font-black select-none transition-colors duration-300"
+                className="text-[10px] font-black select-none pointer-events-none"
               >
                 {cell.id}
               </text>
@@ -252,24 +331,23 @@ export const Board: React.FC = () => {
             {(isStart || isFinal) && (
               <text
                 x={0}
-                y={4}
+                y={3}
                 textAnchor="middle"
                 fill="white"
-                className="text-[9px] font-black tracking-wider uppercase select-none"
+                className="text-[9px] font-black tracking-wider uppercase select-none pointer-events-none"
               >
                 {isStart ? "Início" : "Final"}
               </text>
             )}
           </g>
 
-          {/* Nome da casa no Hover */}
           <title>{`${cell.label} (Casa ${cell.id})`}</title>
         </g>
       );
     });
   };
 
-  // Renderiza os peões sobre as casas, simulando peças físicas 3D
+  // Renderiza os peões sobre as casas, simulando peças físicas 3D com bounce
   const renderPawns = () => {
     return board.map((cell) => {
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
@@ -298,51 +376,62 @@ export const Board: React.FC = () => {
             return (
               <g
                 key={`pawn-${team.id}`}
-                className="transition-all duration-500 ease-out"
+                className="transition-pawn-spring"
                 style={{
                   transform: `translate(${px}px, ${py}px)`,
-                  transformOrigin: `${px}px ${py}px`,
-                  filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))"
                 }}
               >
-                {/* Anelação de pulso para a equipe da vez */}
-                {isActive && (
+                {/* Grupo com a base e o corpo que recebe o bounce de turno ativo */}
+                <g className={isActive ? "animate-pawn-bounce" : ""}>
+                  {/* Sombra oval do peão na base */}
+                  <ellipse
+                    cx={0}
+                    cy={15}
+                    rx={11}
+                    ry={3.5}
+                    fill="rgba(0, 0, 0, 0.22)"
+                    className="pointer-events-none"
+                  />
+
+                  {/* Corpo do Peão (Bolinha com volume e borda branca) */}
                   <circle
                     cx={0}
                     cy={0}
-                    r={20}
-                    fill="none"
-                    stroke={team.color}
-                    strokeWidth={2}
-                    className="animate-pulse-ring"
+                    r={16}
+                    fill={team.color}
+                    stroke="#FFFFFF"
+                    strokeWidth={2.5}
+                    className="pointer-events-none"
                   />
-                )}
 
-                {/* Base do Peão */}
-                <circle
-                  cx={0}
-                  cy={0}
-                  r={15}
-                  fill={team.color}
-                  stroke="#FFFFFF"
-                  strokeWidth={2.5}
-                />
+                  {/* Efeito Glossy 3D de plástico */}
+                  <circle
+                    cx={0}
+                    cy={0}
+                    r={16}
+                    fill="url(#pawnGlossy)"
+                    className="pointer-events-none"
+                  />
 
-                {/* Brilho 3D na peça física */}
-                <circle
-                  cx={-4}
-                  cy={-4}
-                  r={4}
-                  fill="#FFFFFF"
-                  className="opacity-30"
-                />
+                  {/* Anelação pulsante de borda se for a equipe ativa */}
+                  {isActive && (
+                    <circle
+                      cx={0}
+                      cy={0}
+                      r={19}
+                      fill="none"
+                      stroke={team.color}
+                      strokeWidth={2}
+                      className="animate-pulse-ring pointer-events-none"
+                    />
+                  )}
 
-                {/* Ícone do Peão */}
-                <g transform="translate(-8, -8)" className="text-white">
-                  <PawnIcon type={team.pawn} size={16} />
+                  {/* Ícone do Peão no Centro */}
+                  <g transform="translate(-8, -8)" className="text-white pointer-events-none">
+                    <PawnIcon type={team.pawn} size={16} />
+                  </g>
                 </g>
 
-                {/* Mini Tooltip com Nome da Equipe */}
                 <title>{team.name}</title>
               </g>
             );
@@ -355,10 +444,10 @@ export const Board: React.FC = () => {
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-[450px] md:h-[600px] rounded-3xl bg-white border border-slate-100 overflow-hidden flex items-center justify-center shadow-sm"
+      className="relative w-full h-[500px] md:h-[650px] rounded-[32px] bg-gradient-to-b from-slate-50 to-slate-100 border-4 border-white overflow-hidden flex items-center justify-center shadow-lg shadow-slate-200/50"
     >
       {/* Grid de fundo lúdico */}
-      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-60" />
+      <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] bg-[size:20px_20px] pointer-events-none opacity-60" />
 
       {/* Container escalado responsivamente */}
       <div
@@ -375,19 +464,38 @@ export const Board: React.FC = () => {
           viewBox="0 0 1200 900"
           className="w-full h-full"
         >
-          {/* 1. Conexões (Estrada) */}
+          <defs>
+            {/* Gradiente 3D para os peões */}
+            <radialGradient id="pawnGlossy" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
+              <stop offset="45%" stopColor="#ffffff" stopOpacity="0.0" />
+              <stop offset="90%" stopColor="#000000" stopOpacity="0.35" />
+            </radialGradient>
+            
+            {/* Gradiente 3D para as casas */}
+            <radialGradient id="cellGlossy" cx="30%" cy="30%" r="70%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#ffffff" stopOpacity="0.0" />
+              <stop offset="100%" stopColor="#000000" stopOpacity="0.15" />
+            </radialGradient>
+          </defs>
+
+          {/* 1. Decorações de Fundo */}
+          {renderDecorations()}
+
+          {/* 2. Conexões (Estrada) */}
           {renderPathLines()}
 
-          {/* 2. Casas do tabuleiro */}
+          {/* 3. Casas do tabuleiro */}
           {renderCells()}
 
-          {/* 3. Peões */}
+          {/* 4. Peões */}
           {renderPawns()}
         </svg>
       </div>
 
-      {/* Indicador de Legenda de Áreas */}
-      <div className="absolute bottom-4 left-4 right-4 md:right-auto bg-white/90 backdrop-blur-sm p-3 rounded-2xl flex flex-wrap gap-2 text-xs border border-slate-200 pointer-events-none shadow-sm">
+      {/* Legenda de Áreas em badge flutuante */}
+      <div className="absolute bottom-4 left-4 right-4 md:right-auto bg-white/95 backdrop-blur-md px-4 py-3 rounded-2xl flex flex-wrap gap-3 text-xs border border-slate-200 pointer-events-none shadow-md">
         {Object.entries(areaColors).map(([area, color]) => {
           if (["special", "start", "final"].includes(area)) return null;
           
@@ -403,10 +511,10 @@ export const Board: React.FC = () => {
           return (
             <div key={area} className="flex items-center gap-1.5">
               <span
-                className="w-3 h-3 rounded-full border border-slate-350"
+                className="w-3.5 h-3.5 rounded-full border border-white shadow-sm"
                 style={{ backgroundColor: color }}
               />
-              <span className="text-slate-600 font-bold">{name}</span>
+              <span className="text-slate-600 font-extrabold">{name}</span>
             </div>
           );
         })}
