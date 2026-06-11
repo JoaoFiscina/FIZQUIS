@@ -40,25 +40,28 @@ export const VictoryScreen: React.FC = () => {
   if (!winnerTeam) return null;
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center p-4">
+    <div className="min-h-[85vh] flex items-center justify-center p-4">
       <div 
-        className="w-full max-w-lg rounded-3xl bg-white p-8 md:p-12 text-center border border-slate-100 shadow-2xl space-y-8 animate-scale-up"
+        className="w-full max-w-lg rounded-[32px] bg-white p-8 md:p-12 text-center border-[6px] border-slate-800 shadow-2xl space-y-8 animate-scale-up relative"
         style={{
-          boxShadow: `0 15px 40px -10px ${winnerTeam.color}25, 0 0 0 1px rgba(0, 0, 0, 0.02)`
+          boxShadow: `0 20px 50px -10px ${winnerTeam.color}30, 0 0 0 1px rgba(0, 0, 0, 0.02)`
         }}
       >
+        {/* Costura tracejada interna do card físico */}
+        <div className="absolute inset-1.5 border-[2px] border-dashed border-slate-200 rounded-[22px] pointer-events-none z-10" />
+
         {/* Ícone de Troféu Brilhante */}
-        <div className="relative mx-auto w-24 h-24 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center text-yellow-600">
+        <div className="relative mx-auto w-24 h-24 rounded-full bg-yellow-50 border border-yellow-100 flex items-center justify-center text-yellow-600 z-10">
           <Trophy size={48} className="animate-bounce" />
           <div className="absolute inset-0 rounded-full border-2 border-yellow-400/20 animate-ping" />
         </div>
 
         {/* Informações da Vitória */}
-        <div className="space-y-3">
-          <span className="text-[10px] font-black text-indigo-700 tracking-widest uppercase bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">
+        <div className="space-y-3 relative z-10">
+          <span className="text-[9px] font-black text-indigo-755 tracking-widest uppercase bg-indigo-50 border border-indigo-100 px-3.5 py-1.5 rounded-full shadow-sm">
             Temos uma vencedora!
           </span>
-          <h2 className="text-3xl font-black text-slate-800 leading-tight uppercase">
+          <h2 className="text-3xl font-black text-slate-800 leading-tight uppercase pt-2">
             Vitória da Equipe
           </h2>
           <h3 className="text-2xl font-black uppercase tracking-wide" style={{ color: winnerTeam.color }}>
@@ -67,7 +70,7 @@ export const VictoryScreen: React.FC = () => {
         </div>
 
         {/* Visual do Peão Vencedor */}
-        <div className="flex justify-center">
+        <div className="flex justify-center relative z-10">
           <div 
             className="w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg relative border-4 border-white"
             style={{ 
@@ -79,25 +82,25 @@ export const VictoryScreen: React.FC = () => {
           </div>
         </div>
 
-        <p className="text-slate-650 text-sm leading-relaxed max-w-sm mx-auto font-semibold">
+        <p className="text-slate-650 text-sm leading-relaxed max-w-sm mx-auto font-semibold relative z-10">
           O plantão finalmente acabou! Esta equipe demonstrou condutas impecáveis, superou as intercorrências do round e conquistou a tão sonhada vaga na residência.
         </p>
 
         {/* Botões de Ação */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4 relative z-10">
           <button
             onClick={resetGame}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-black text-sm tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-indigo-100/50 hover:shadow-indigo-200/50"
+            className="btn-3d-indigo w-full sm:w-auto px-6 py-3.5 rounded-2xl text-white font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer"
           >
-            <RefreshCw size={16} />
+            <RefreshCw size={15} />
             <span>Jogar Novamente</span>
           </button>
           
           <button
             onClick={resetGame}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+            className="btn-3d-white w-full sm:w-auto px-6 py-3.5 rounded-2xl text-slate-700 font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer"
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={15} />
             <span>Voltar ao Menu</span>
           </button>
         </div>

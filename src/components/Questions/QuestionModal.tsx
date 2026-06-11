@@ -69,79 +69,74 @@ export const QuestionModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
       <div 
-        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white overflow-x-hidden border border-slate-100 shadow-2xl animate-scale-up"
+        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[32px] bg-white overflow-x-hidden border-[6px] border-slate-800 shadow-2xl animate-scale-up"
         style={{
-          boxShadow: `0 15px 40px -10px ${areaColor}25, 0 0 0 1px rgba(0, 0, 0, 0.02)`
+          boxShadow: `0 20px 45px -10px ${areaColor}30, 0 0 0 1px rgba(0, 0, 0, 0.02)`
         }}
       >
-        {/* Header da Pergunta */}
+        <div className="absolute inset-1.5 border-[2px] border-dashed border-slate-200 rounded-[22px] pointer-events-none" />
+
         <div 
-          className="p-5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3 text-sm font-semibold text-slate-500"
+          className="p-5 border-b-2 border-slate-100 flex flex-wrap items-center justify-between gap-3 text-sm font-semibold text-slate-500 relative z-10"
           style={{ background: `linear-gradient(to right, ${areaColor}08, transparent)` }}
         >
           <div className="flex items-center gap-2">
             <span 
-              className="w-3.5 h-3.5 rounded-full border border-white/20"
+              className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-sm"
               style={{ backgroundColor: areaColor }}
             />
-            <span className="text-slate-800 text-base tracking-wide font-black">
+            <span className="text-slate-800 text-base tracking-wide font-black uppercase">
               {areaNames[activeQuestion.area]}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border ${diffInfo.className}`}>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border shadow-sm ${diffInfo.className}`}>
               {diffInfo.label}
             </span>
-            <span className="text-slate-300">•</span>
-            <span className="text-indigo-650 font-bold uppercase tracking-wider text-xs">
+            <span className="text-slate-350 font-black">•</span>
+            <span className="text-indigo-650 font-black uppercase tracking-wider text-xs bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-lg shadow-sm">
               {selectedCell.label}
             </span>
           </div>
         </div>
 
-        {/* Corpo da Pergunta */}
-        <div className="p-6 md:p-8 space-y-6">
-          {/* Turno da equipe */}
+        <div className="p-6 md:p-8 space-y-6 relative z-10">
           <div className="flex items-center justify-between text-xs text-slate-400">
             <div>
-              <span className="font-semibold">Vez da equipe: </span>
-              <span className="font-bold text-sm" style={{ color: activeTeam.color }}>
+              <span className="font-bold uppercase tracking-wider text-[10px]">Vez de: </span>
+              <span className="font-black text-sm uppercase" style={{ color: activeTeam.color }}>
                 {activeTeam.name}
               </span>
             </div>
             {passPlantaoTargetTeamId && (
-              <div className="flex items-center gap-1 bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded-md font-bold">
+              <div className="flex items-center gap-1 bg-purple-50 text-purple-700 border border-purple-100 px-2.5 py-1 rounded-xl font-bold shadow-sm">
                 <Send size={12} />
-                <span>Respondendo: {respondingTeam.name}</span>
+                <span className="text-[10px] uppercase">Respondendo: {respondingTeam.name}</span>
               </div>
             )}
           </div>
 
-          {/* Enunciado do caso clínico */}
-          <p className="text-slate-700 text-base md:text-lg font-semibold leading-relaxed bg-slate-50 p-5 rounded-2xl border border-slate-100">
+          <p className="text-slate-700 text-base md:text-lg font-bold leading-relaxed bg-slate-50/75 p-5 rounded-[20px] border border-slate-100/80 shadow-inner">
             {activeQuestion.statement}
           </p>
 
-          {/* Botões de Ação Especiais (Dupla Checagem e Passa o Plantão) */}
           {isAnswering && !showTargetSelect && (
             <div className="flex flex-wrap gap-3">
-              {/* Dupla Checagem */}
               {selectedCell.specialEffect === "dupla_checagem" && eliminatedOptions.length === 0 && (
                 <button
                   onClick={eliminateTwoOptions}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100/70 transition-all cursor-pointer shadow-sm"
+                  className="btn-3d-cyan flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black tracking-wide text-white cursor-pointer"
                 >
                   <Sparkles size={14} />
                   <span>Dupla Checagem (Eliminar 2 Erradas)</span>
                 </button>
               )}
 
-              {/* Passa o Plantão */}
               {selectedCell.specialEffect === "passa_plantao" && !passPlantaoTargetTeamId && (
                 <button
                   onClick={() => setShowTargetSelect(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100/70 transition-all cursor-pointer shadow-sm"
+                  className="btn-3d-purple flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black tracking-wide text-white cursor-pointer"
                 >
                   <Send size={14} />
                   <span>Passar o Plantão</span>
@@ -150,11 +145,10 @@ export const QuestionModal: React.FC = () => {
             </div>
           )}
 
-          {/* Menu de seleção de Alvo do Passa Plantão */}
           {showTargetSelect && (
-            <div className="p-4 rounded-xl border border-purple-200 bg-purple-50/50 space-y-3">
-              <p className="text-xs font-bold text-purple-750 uppercase tracking-wider">Escolha quem responderá o plantão:</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="p-4 rounded-2xl border border-purple-200 bg-purple-50/50 space-y-3 shadow-inner">
+              <p className="text-[10px] font-black text-purple-800 uppercase tracking-wider">Escolha quem responderá o plantão:</p>
+              <div className="flex flex-wrap gap-2.5">
                 {opponentTeams.map(t => (
                   <button
                     key={t.id}
@@ -162,15 +156,15 @@ export const QuestionModal: React.FC = () => {
                       passPlantao(t.id);
                       setShowTargetSelect(false);
                     }}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold border text-slate-800 hover:bg-white transition-all cursor-pointer shadow-sm"
-                    style={{ borderColor: `${t.color}30`, backgroundColor: `${t.color}05` }}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-800 cursor-pointer bg-white border border-slate-200 shadow-[0_3px_0_#e2e8f0]"
+                    style={{ borderTop: `3px solid ${t.color}` }}
                   >
                     {t.name}
                   </button>
                 ))}
                 <button
                   onClick={() => setShowTargetSelect(false)}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-500 hover:bg-slate-200 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-500 hover:bg-slate-200 cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
@@ -178,32 +172,31 @@ export const QuestionModal: React.FC = () => {
             </div>
           )}
 
-          {/* Alternativas A, B, C e D */}
           <div className="grid grid-cols-1 gap-3">
             {Object.entries(activeQuestion.options).map(([key, value]) => {
               const optKey = key as "A" | "B" | "C" | "D";
               const isEliminated = eliminatedOptions.includes(optKey);
               const isSelected = selectedOption === optKey;
               
-              let cardStyle = "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300";
-              let badgeStyle = "bg-slate-200 text-slate-600";
+              let cardStyle = "bg-white border-2 border-slate-250 text-slate-700 hover:bg-slate-50 shadow-[0_4px_0_#cbd5e1]";
+              let badgeStyle = "bg-slate-100 text-slate-500 border border-slate-200";
 
               if (isEliminated) {
-                cardStyle = "opacity-20 bg-slate-100 border-transparent text-slate-350 cursor-not-allowed line-through";
-                badgeStyle = "bg-slate-150 text-slate-400";
+                cardStyle = "opacity-20 bg-slate-100 border-dashed border-slate-200 text-slate-300 cursor-not-allowed line-through shadow-none";
+                badgeStyle = "bg-slate-100 text-slate-300 border-transparent";
               } else if (isAnswering) {
                 if (isSelected) {
-                  cardStyle = `bg-indigo-50 border-indigo-500 text-indigo-700 ring-2 ring-indigo-100 font-bold`;
-                  badgeStyle = "bg-indigo-600 text-white";
+                  cardStyle = `bg-indigo-50 border-2 border-indigo-500 text-indigo-700 shadow-[0_4px_0_#4338ca] font-bold`;
+                  badgeStyle = "bg-indigo-600 text-white border-indigo-650";
                 }
               } else if (isResolving) {
                 const isCorrectOpt = optKey === activeQuestion.correctAnswer;
                 if (isCorrectOpt) {
-                  cardStyle = "bg-green-50 border-green-500 text-green-800 shadow-sm font-bold";
-                  badgeStyle = "bg-green-600 text-white";
+                  cardStyle = "bg-green-50/60 border-2 border-green-500 text-green-800 shadow-[0_4px_0_#15803d] font-bold";
+                  badgeStyle = "bg-green-600 text-white border-green-650";
                 } else if (isSelected) {
-                  cardStyle = "bg-red-50 border-red-500 text-red-850 shadow-sm font-semibold";
-                  badgeStyle = "bg-red-500 text-white";
+                  cardStyle = "bg-red-50/60 border-2 border-red-500 text-red-800 shadow-[0_4px_0_#b91c1c] font-semibold";
+                  badgeStyle = "bg-red-500 text-white border-red-650";
                 }
               }
 
@@ -212,24 +205,23 @@ export const QuestionModal: React.FC = () => {
                   key={optKey}
                   onClick={() => handleOptionClick(optKey)}
                   disabled={!isAnswering || isEliminated}
-                  className={`w-full text-left p-4 rounded-xl border flex items-center gap-4 transition-all duration-205 ${cardStyle} ${
+                  className={`w-full text-left p-4 rounded-2xl flex items-center gap-4 transition-all ${cardStyle} ${
                     isAnswering && !isEliminated ? "cursor-pointer" : "cursor-default"
                   }`}
                 >
-                  <span className={`w-7 h-7 flex items-center justify-center rounded-lg text-sm font-black transition-colors ${badgeStyle}`}>
+                  <span className={`w-7.5 h-7.5 flex items-center justify-center rounded-xl text-xs font-black transition-colors shadow-sm ${badgeStyle}`}>
                     {optKey}
                   </span>
-                  <span className="flex-1 text-sm font-semibold text-slate-750">{value}</span>
+                  <span className="flex-1 text-xs md:text-sm font-bold text-slate-700 leading-normal">{value}</span>
 
-                  {/* Icones de Feedback de Acerto/Erro */}
                   {isResolving && optKey === activeQuestion.correctAnswer && (
-                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-700">
-                      <Check size={14} strokeWidth={3} />
+                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-green-100 text-green-700 border border-green-200 shadow-sm shrink-0">
+                      <Check size={14} strokeWidth={3.5} />
                     </span>
                   )}
                   {isResolving && isSelected && optKey !== activeQuestion.correctAnswer && (
-                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-700">
-                      <X size={14} strokeWidth={3} />
+                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-red-100 text-red-700 border border-red-200 shadow-sm shrink-0">
+                      <X size={14} strokeWidth={3.5} />
                     </span>
                   )}
                 </button>
@@ -237,41 +229,39 @@ export const QuestionModal: React.FC = () => {
             })}
           </div>
 
-          {/* Feedback de Resposta e Explicação do Caso Clínico */}
           {isResolving && (
             <div 
-              className="p-5 rounded-xl border animate-slide-up space-y-2"
+              className="p-5 rounded-2xl border-2 animate-slide-up space-y-2"
               style={{
                 backgroundColor: `${areaColor}05`,
                 borderColor: `${areaColor}15`
               }}
             >
-              <div className="flex items-center gap-2 text-sm font-black tracking-wider uppercase" style={{ color: areaColor }}>
-                <HelpCircle size={16} />
+              <div className="flex items-center gap-2 text-xs font-black tracking-wider uppercase" style={{ color: areaColor }}>
+                <HelpCircle size={15} />
                 <span>Discussão de Conduta / Justificativa</span>
               </div>
-              <p className="text-slate-600 text-sm font-medium leading-relaxed">
+              <p className="text-slate-650 text-xs md:text-sm font-semibold leading-relaxed">
                 {activeQuestion.explanation}
               </p>
               {activeQuestion.source && (
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pt-2">
-                  Fonte: {activeQuestion.source}
+                <p className="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider pt-1">
+                  Fonte Oficial: {activeQuestion.source}
                 </p>
               )}
             </div>
           )}
         </div>
 
-        {/* Footer do Modal */}
-        <div className="p-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+        <div className="p-5 bg-slate-50 border-t border-slate-100 flex justify-end gap-3.5 relative z-10">
           {isAnswering ? (
             <button
               onClick={handleSubmit}
               disabled={!selectedOption}
-              className={`px-6 py-2.5 rounded-xl text-sm font-bold tracking-wide transition-all ${
+              className={`px-7 py-3 rounded-2xl text-xs font-black tracking-wider uppercase transition-all ${
                 selectedOption
-                  ? "bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer shadow-md shadow-indigo-100/50 hover:shadow-indigo-200/50"
-                  : "bg-slate-200 text-slate-400 border border-slate-350 cursor-not-allowed"
+                  ? "btn-3d-indigo text-white cursor-pointer"
+                  : "bg-slate-100 text-slate-350 border border-slate-200/80 cursor-not-allowed shadow-none"
               }`}
             >
               Submeter Conduta
@@ -279,7 +269,7 @@ export const QuestionModal: React.FC = () => {
           ) : (
             <button
               onClick={handleContinue}
-              className="px-6 py-2.5 rounded-xl text-sm font-bold tracking-wide bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white cursor-pointer shadow-lg shadow-indigo-100/50 hover:shadow-indigo-200/70"
+              className="btn-3d-indigo px-7 py-3 rounded-2xl text-white font-black text-xs tracking-wider uppercase cursor-pointer"
             >
               Continuar Turno
             </button>

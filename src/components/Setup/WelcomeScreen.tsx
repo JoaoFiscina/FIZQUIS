@@ -66,7 +66,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStartSetup }) =>
             <span>Como Jogar</span>
           </button>
         </div>
-      </div>  </div>
+      </div>
 
       {/* Rodapé Decorativo */}
       <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest pt-8 select-none">

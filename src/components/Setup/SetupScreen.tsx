@@ -84,7 +84,9 @@ export const SetupScreen: React.FC = () => {
     }
 
     initializeGame(teamsData);
-   return (
+  };
+
+  return (
     <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-6 animate-fade-in">
       {/* Cabeçalho */}
       <div className="text-center space-y-2">

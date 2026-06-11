@@ -397,7 +397,7 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
         : "bg-slate-900/0 backdrop-blur-none duration-400 ease-in pointer-events-none"
   }`;
 
-  const cardClasses = `relative w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-[32px] border border-slate-100 transition-all duration-500 ease-out flex flex-col ${
+  const cardClasses = `relative w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-[32px] border-[6px] border-slate-800 transition-all duration-500 ease-out flex flex-col ${
     animationState === "entering"
       ? "opacity-0 scale-90 translate-y-4"
       : animationState === "visible"
@@ -408,15 +408,17 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
   return (
     <div className={backdropClasses}>
       <div className={cardClasses}>
+        {/* Costura tracejada interna do card físico */}
+        <div className="absolute inset-1.5 border-[2px] border-dashed border-slate-200 rounded-[22px] pointer-events-none z-10" />
         
         {/* Linha colorida decorativa no topo */}
         <div className="h-2 w-full shrink-0" style={{ backgroundColor: themeColor }} />
 
-        <div className="p-8 flex flex-col items-center text-center relative flex-1">
+        <div className="p-8 flex flex-col items-center text-center relative flex-1 z-10">
           {activeTeam && (
             <div 
               style={{ backgroundColor: activeTeam.color }} 
-              className="px-4 py-1 mb-5 text-[10px] font-black uppercase tracking-wider rounded-full shadow-sm text-white"
+              className="px-4 py-1 mb-5 text-[10px] font-black uppercase tracking-wider rounded-full shadow-md text-white"
             >
               Vez de: {activeTeam.name}
             </div>
@@ -432,11 +434,11 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
             {cardIcon}
           </div>
 
-          <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">
+          <h3 className="text-2xl font-black text-slate-800 tracking-tight leading-tight uppercase">
             {cardTitle}
           </h3>
           
-          <p className="mt-1.5 text-xs text-slate-400 font-bold uppercase tracking-wider">
+          <p className="mt-1.5 text-[10px] text-slate-400 font-extrabold uppercase tracking-wider bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded-lg shadow-sm">
             Casa {selectedCell.id} • {
               selectedCell.region === "inicio" 
                 ? "Região Inicial" 
@@ -460,7 +462,7 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
 
           <div className="w-12 h-1 bg-slate-100 rounded-full my-5 shrink-0" />
 
-          <p className="text-slate-600 font-bold text-base leading-relaxed max-w-sm">
+          <p className="text-slate-650 font-bold text-sm md:text-base leading-relaxed max-w-sm">
             “{cardSubtitle}”
           </p>
 
@@ -471,10 +473,10 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
           <div className="w-full mt-6">
             <button
               onClick={handleDismiss}
-              className="w-full py-4 px-6 text-white rounded-2xl font-black text-sm active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+              className="w-full py-3.5 px-6 text-white rounded-2xl font-black text-xs uppercase tracking-wider transition-all duration-100 flex items-center justify-center gap-2 group cursor-pointer hover:translate-y-[1px] active:translate-y-[4px]"
               style={{ 
                 backgroundColor: themeColor, 
-                boxShadow: `0 8px 20px -6px ${themeColor}50`
+                boxShadow: `0 4px 0 rgba(0,0,0,0.18), 0 8px 16px -4px ${themeColor}40`
               }}
             >
               <Play size={14} className="fill-current text-white group-hover:translate-x-0.5 transition-transform" />

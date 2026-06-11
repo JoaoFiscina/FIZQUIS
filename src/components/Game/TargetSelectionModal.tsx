@@ -52,48 +52,51 @@ export const TargetSelectionModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 border border-slate-100 text-center space-y-6 shadow-2xl animate-scale-up">
+      <div className="w-full max-w-md rounded-[32px] bg-white p-8 border-[6px] border-slate-800 text-center space-y-6 shadow-2xl animate-scale-up relative">
+        {/* Costura tracejada interna do card físico */}
+        <div className="absolute inset-1.5 border-[2px] border-dashed border-slate-200 rounded-[22px] pointer-events-none" />
+
         {/* Ícone Animado */}
-        <div className="mx-auto w-16 h-16 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-sm">
+        <div className="mx-auto w-16 h-16 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-inner relative z-10">
           <Icon size={28} className="animate-pulse" />
         </div>
 
         {/* Título e Descrição */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-black text-slate-800 tracking-wide">{title}</h2>
-          <p className="text-sm text-slate-500 font-semibold leading-relaxed px-4">{description}</p>
+        <div className="space-y-2 relative z-10">
+          <h2 className="text-xl font-black text-slate-850 tracking-wide uppercase">{title}</h2>
+          <p className="text-xs md:text-sm text-slate-500 font-bold leading-relaxed px-4">{description}</p>
         </div>
 
         {/* Candidatos a Alvo */}
-        <div className="grid grid-cols-1 gap-2.5">
+        <div className="grid grid-cols-1 gap-3 relative z-10">
           {targetCandidates.length > 0 ? (
             targetCandidates.map(t => (
               <button
                 key={t.id}
                 onClick={() => handleSelect(t.id)}
-                className="w-full p-4 rounded-xl border text-left flex items-center justify-between hover:bg-slate-50 transition-all cursor-pointer font-bold shadow-sm"
-                style={{ borderColor: `${t.color}30`, backgroundColor: `${t.color}05` }}
+                className="w-full p-4 rounded-2xl border flex items-center justify-between hover:bg-slate-50 transition-all cursor-pointer font-bold btn-option-3d bg-white"
+                style={{ borderColor: `${t.color}30`, borderLeft: `5px solid ${t.color}` }}
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className="w-4 h-4 rounded-full border border-white/20"
+                    className="w-4 h-4 rounded-full border border-white/20 shadow-md"
                     style={{ backgroundColor: t.color }}
                   />
-                  <span className="text-slate-800 text-base">{t.name}</span>
+                  <span className="text-slate-800 text-sm font-black uppercase">{t.name}</span>
                 </div>
-                <span className="text-xs text-slate-550 font-extrabold bg-slate-100 px-2 py-0.5 rounded">
+                <span className="text-[10px] text-slate-550 font-black bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-lg shadow-sm">
                   Casa {t.position}
                 </span>
               </button>
             ))
           ) : (
-            <div className="p-4 text-sm text-slate-500 bg-slate-50 rounded-xl border border-slate-100 font-semibold">
-              Nenhuma equipe elegível encontrada! Passando a vez...
+            <div className="p-5 text-xs text-slate-500 bg-slate-50 rounded-2xl border border-slate-150 font-bold leading-relaxed shadow-inner">
+              Nenhuma equipe elegível encontrada no percurso! Passando a vez...
               <button
                 onClick={() => handleSelect("")}
-                className="mt-3 block w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition-all cursor-pointer shadow-md shadow-indigo-100/50"
+                className="mt-4 block w-full py-3 btn-3d-indigo text-white rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer"
               >
-                Continuar
+                Continuar Jogando
               </button>
             </div>
           )}
