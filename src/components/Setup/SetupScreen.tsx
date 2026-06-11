@@ -84,18 +84,18 @@ export const SetupScreen: React.FC = () => {
     }
 
     initializeGame(teamsData);
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-6 p-4 md:p-6 animate-fade-in">
+   return (
+    <div className="max-w-4xl mx-auto space-y-8 p-4 md:p-6 animate-fade-in">
       {/* Cabeçalho */}
-      <div className="text-center space-y-1.5">
-        <h2 className="text-2xl md:text-3xl font-black text-slate-800 tracking-wide uppercase">Configuração das Equipes</h2>
-        <p className="text-xs md:text-sm text-slate-500 font-semibold">Monte seu plantão com 2 a 4 equipes e selecione as peças.</p>
+      <div className="text-center space-y-2">
+        <h2 className="text-3xl md:text-4xl font-black text-slate-800 tracking-wide uppercase leading-tight">Configuração de Equipes</h2>
+        <p className="text-xs md:text-sm text-slate-500 font-bold max-w-md mx-auto">
+          Monte o seu plantão de gincana médica escolhendo as cores e peças exclusivas para cada time.
+        </p>
       </div>
 
       {/* Grid de Equipes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {teamsData.map((team, idx) => {
           const usedPawns = teamsData.map((t, i) => (i !== idx ? t.pawn : null)).filter(Boolean);
           const usedColors = teamsData.map((t, i) => (i !== idx ? t.color : null)).filter(Boolean);
@@ -103,19 +103,20 @@ export const SetupScreen: React.FC = () => {
           return (
             <div
               key={idx}
-              className="relative p-5 rounded-3xl bg-white border border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md"
+              className="relative p-6 rounded-[32px] bg-white border-2 border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:border-slate-200"
               style={{
-                boxShadow: `0 8px 25px -8px ${team.color}15, 0 4px 6px -1px rgba(0,0,0,0.01)`
+                borderTop: `8px solid ${team.color}`,
+                boxShadow: `0 12px 30px -10px ${team.color}20, 0 4px 6px -1px rgba(0,0,0,0.01)`
               }}
             >
               {/* Botão de Excluir Equipe */}
               {teamsData.length > 2 && (
                 <button
                   onClick={() => handleRemoveTeam(idx)}
-                  className="absolute top-4 right-4 text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors p-1.5 rounded-lg cursor-pointer"
+                  className="absolute top-4 right-4 text-slate-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 border border-transparent transition-all p-1.5 rounded-xl cursor-pointer shadow-sm active:scale-95"
                   title="Remover Equipe"
                 >
-                  <Trash2 size={15} />
+                  <Trash2 size={14} />
                 </button>
               )}
 
@@ -123,13 +124,13 @@ export const SetupScreen: React.FC = () => {
                 {/* Número da Equipe */}
                 <div className="flex items-center gap-2">
                   <span
-                    className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-sm"
+                    className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-black text-white shadow-md"
                     style={{ backgroundColor: team.color }}
                   >
                     {idx + 1}
                   </span>
-                  <span className="text-xs font-black text-slate-450 uppercase tracking-widest">
-                    Equipe {idx + 1}
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    Plantonista {idx + 1}
                   </span>
                 </div>
 
@@ -140,7 +141,7 @@ export const SetupScreen: React.FC = () => {
                     type="text"
                     value={team.name}
                     onChange={(e) => handleUpdateTeam(idx, { name: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200/80 hover:bg-slate-50/50 rounded-xl py-3 pl-10 pr-4 text-xs font-bold text-slate-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
+                    className="w-full bg-slate-50 border border-slate-200/80 hover:bg-slate-50/50 rounded-2xl py-3 pl-10 pr-4 text-xs font-bold text-slate-800 focus:outline-none focus:border-indigo-500 focus:bg-white transition-colors"
                     placeholder="Nome da Equipe..."
                     maxLength={25}
                   />
@@ -148,8 +149,8 @@ export const SetupScreen: React.FC = () => {
 
                 {/* Seletor de Cores */}
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-black text-slate-450 uppercase tracking-wider block">Escolha a Cor</label>
-                  <div className="flex flex-wrap gap-2">
+                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Identificação (Cor)</label>
+                  <div className="flex flex-wrap gap-2.5">
                     {PRESET_COLORS.map((c) => {
                       const isColorUsed = usedColors.includes(c);
                       const isSelected = team.color === c;
@@ -159,11 +160,11 @@ export const SetupScreen: React.FC = () => {
                           key={c}
                           disabled={isColorUsed}
                           onClick={() => handleUpdateTeam(idx, { color: c })}
-                          className={`w-6.5 h-6.5 rounded-full border-2 transition-all cursor-pointer relative ${
+                          className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer relative ${
                             isColorUsed ? "opacity-10 cursor-not-allowed scale-75" : ""
                           } ${
                             isSelected 
-                              ? "scale-110 border-white shadow-md ring-2 ring-slate-800 ring-offset-1" 
+                              ? "scale-110 border-white shadow-md ring-2 ring-slate-850 ring-offset-1" 
                               : "border-transparent hover:scale-105"
                           }`}
                           style={{ backgroundColor: c }}
@@ -179,8 +180,8 @@ export const SetupScreen: React.FC = () => {
 
                 {/* Seletor de Peões */}
                 <div className="space-y-1.5">
-                  <label className="text-[9px] font-black text-slate-450 uppercase tracking-wider block">Escolha o Peão</label>
-                  <div className="grid grid-cols-4 gap-1.5">
+                  <label className="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Escolha a Peça</label>
+                  <div className="grid grid-cols-4 gap-2">
                     {pawnOptions.map((opt) => {
                       const isPawnUsed = usedPawns.includes(opt.id);
                       const isSelected = team.pawn === opt.id;
@@ -190,16 +191,16 @@ export const SetupScreen: React.FC = () => {
                           key={opt.id}
                           disabled={isPawnUsed}
                           onClick={() => handleUpdateTeam(idx, { pawn: opt.id })}
-                          className={`p-2 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all ${
+                          className={`p-2.5 rounded-2xl border flex flex-col items-center justify-center gap-1.5 transition-all ${
                             isPawnUsed
                               ? "opacity-15 cursor-not-allowed bg-slate-50 border-transparent text-slate-300"
                               : isSelected
-                              ? "border-indigo-600 bg-indigo-50/50 text-indigo-600 shadow-sm font-bold scale-[1.02]"
-                              : "border-slate-100 bg-slate-50 text-slate-500 hover:bg-slate-100/80 hover:text-slate-800 cursor-pointer"
+                              ? "border-indigo-650 bg-indigo-50/50 text-indigo-650 shadow-sm font-bold scale-[1.03]"
+                              : "border-slate-100 bg-slate-50 text-slate-500 hover:bg-slate-100/80 hover:text-slate-850 cursor-pointer active:scale-95"
                           }`}
                           title={opt.description}
                         >
-                          <PawnIcon type={opt.id} size={16} />
+                          <PawnIcon type={opt.id} size={18} />
                           <span className="text-[8px] font-extrabold text-center select-none truncate w-full">
                             {opt.label}
                           </span>
@@ -211,10 +212,10 @@ export const SetupScreen: React.FC = () => {
               </div>
 
               {/* Preview 3D do Peão Refinado */}
-              <div className="mt-4 flex items-center gap-3 bg-slate-50/80 p-3 rounded-2xl border border-slate-100 shadow-inner">
+              <div className="mt-5 flex items-center gap-3.5 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100 shadow-inner">
                 {/* SVG 3D Pawn Render */}
                 <div className="flex-shrink-0">
-                  <svg className="w-10 h-10 overflow-visible" viewBox="0 0 32 32">
+                  <svg className="w-11 h-11 overflow-visible" viewBox="0 0 32 32">
                     <defs>
                       <radialGradient id={`setupGlossy-${idx}`} cx="30%" cy="30%" r="70%">
                         <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
@@ -225,7 +226,7 @@ export const SetupScreen: React.FC = () => {
                     {/* Shadow base */}
                     <ellipse cx={16} cy={27} rx={10} ry={3} fill="rgba(0, 0, 0, 0.15)" />
                     {/* Pawn body sphere */}
-                    <circle cx={16} cy={16} r={13} fill={team.color} stroke="#FFFFFF" strokeWidth={2} />
+                    <circle cx={16} cy={16} r={13} fill={team.color} stroke="#FFFFFF" strokeWidth={2.5} />
                     <circle cx={16} cy={16} r={13} fill={`url(#setupGlossy-${idx})`} />
                     {/* Inner symbol */}
                     <g transform="translate(8, 8)" className="text-white pointer-events-none">
@@ -235,7 +236,7 @@ export const SetupScreen: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-black text-slate-700 uppercase select-none">
-                    Aparência da Peça
+                    Preview do Peão
                   </p>
                   <p className="text-[9px] text-slate-400 font-bold truncate">
                     {pawnOptions.find((p) => p.id === team.pawn)?.description}
@@ -249,18 +250,18 @@ export const SetupScreen: React.FC = () => {
 
       {/* Mensagem de Erro */}
       {error && (
-        <div className="flex items-center gap-2 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-650 text-xs font-bold animate-shake">
+        <div className="flex items-center gap-2.5 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-650 text-xs font-bold animate-shake">
           <AlertCircle size={15} />
           <span>{error}</span>
         </div>
       )}
 
       {/* Controles de Ação */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
         {teamsData.length < 4 && (
           <button
             onClick={handleAddTeam}
-            className="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+            className="btn-3d-white w-full sm:w-auto px-6 py-3.5 rounded-2xl text-slate-700 font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer"
           >
             <Plus size={15} />
             <span>Adicionar Equipe</span>
@@ -269,12 +270,15 @@ export const SetupScreen: React.FC = () => {
 
         <button
           onClick={handleStartGame}
-          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-850 text-white font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-indigo-150 hover:shadow-lg hover:shadow-indigo-200"
+          className="btn-3d-indigo w-full sm:w-auto px-10 py-4 rounded-2xl text-white font-black text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer"
         >
           <Play size={15} />
           <span>Iniciar Partida</span>
         </button>
       </div>
+    </div>
+  );
+};
     </div>
   );
 };
