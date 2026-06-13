@@ -88,7 +88,7 @@ export const Board: React.FC = () => {
     if (targetCell) {
       const cx = targetCell.position.x * 10;
       const cy = targetCell.position.y * 10;
-      const zoom = phase === "revealing_cell" ? 1.50 : 1.38;
+      const zoom = phase === "revealing_cell" ? 1.55 : 1.42;
       const maxOffset = 500 * (1 - 1 / zoom);
       currentZoom = zoom;
       currentTx = Math.max(-maxOffset, Math.min(maxOffset, 500 - cx));
@@ -174,14 +174,14 @@ export const Board: React.FC = () => {
         const isShortcut = cell.pathGroup === "shortcut" || targetCell.pathGroup === "shortcut";
         const isLong = cell.pathGroup === "long" || targetCell.pathGroup === "long";
         
-        let roadColor = "#F3E8FF"; // Lilás claro macio para caminho comum
-        let borderColor = "#E9D5FF"; // Borda lilás para caminho comum
+        let roadColor = "#F1F5F9"; // Cinza claro premium (padrão de pista de tabuleiro)
+        let borderColor = "#CBD5E1";
 
         if (isShortcut) {
-          roadColor = "#E0F2FE"; // Azul claro macio para atalhos
-          borderColor = "#BAE6FD";
+          roadColor = "#ECFDF5"; // Verde água para atalhos
+          borderColor = "#A7F3D0";
         } else if (isLong) {
-          roadColor = "#FEF3C7"; // Creme para o caminho longo
+          roadColor = "#FFFBEB"; // Creme para o caminho longo
           borderColor = "#FDE68A";
         }
 
@@ -203,8 +203,8 @@ export const Board: React.FC = () => {
             <path
               d={pathD}
               fill="none"
-              stroke="rgba(0, 0, 0, 0.05)"
-              strokeWidth={60}
+              stroke="rgba(0, 0, 0, 0.04)"
+              strokeWidth={94}
               strokeLinecap="round"
             />
             {/* Border */}
@@ -212,7 +212,7 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke={borderColor}
-              strokeWidth={52}
+              strokeWidth={84}
               strokeLinecap="round"
             />
             {/* Road body */}
@@ -220,7 +220,7 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke={roadColor}
-              strokeWidth={44}
+              strokeWidth={76}
               strokeLinecap="round"
             />
           </g>
@@ -229,14 +229,16 @@ export const Board: React.FC = () => {
     });
 
     return lines;
-  };const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
-  if (isStart) return "url(#grad-start)";
-  if (isFinal) return "url(#grad-final)";
-  if (cell.specialEffect === "curinga") return "url(#grad-curinga)";
-  if (cell.specialEffect) return "url(#grad-special)";
-  if (cell.area) return `url(#grad-${cell.area})`;
-  return "url(#grad-start)";
-};
+  };
+
+  const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
+    if (isStart) return "url(#grad-start)";
+    if (isFinal) return "url(#grad-final)";
+    if (cell.specialEffect === "curinga") return "url(#grad-curinga)";
+    if (cell.specialEffect) return "url(#grad-special)";
+    if (cell.area) return `url(#grad-${cell.area})`;
+    return "url(#grad-start)";
+  };
 
   // Helper to calculate cell path angle
   const getCellAngle = (cell: any, board: any[]) => {
