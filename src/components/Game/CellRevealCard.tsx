@@ -268,8 +268,8 @@ export const CellRevealCard: React.FC<CellRevealCardProps> = ({ onComplete }) =>
       setAnimationState("visible");
     }, 500);
 
-    // 2. Permanência na tela: 6000 ms (com barra de progresso decrementando)
-    const permanenceDuration = 6000;
+    // 2. Permanência na tela: 4000 ms (com barra de progresso decrementando)
+    const permanenceDuration = 4000;
     const intervalTime = 20;
     const steps = permanenceDuration / intervalTime;
     let currentStep = steps;

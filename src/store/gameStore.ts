@@ -261,8 +261,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 870ms por casa para animação (pulo de 750ms + pausa de 120ms)
-        await new Promise((resolve) => setTimeout(resolve, 870));
+        // Atraso de 950ms por casa para animação (pulo de 800ms + pausa de 150ms)
+        await new Promise((resolve) => setTimeout(resolve, 950));
 
         // Recursão
         await get().moveActiveTeam(stepsLeft - 1);
@@ -286,8 +286,8 @@ export const useGameStore = create<GameState>()(
           isReturning: false
         });
 
-        // Atraso antes do próximo passo (respeitando o tempo de pulo de 750ms + pausa de 120ms)
-        await new Promise((resolve) => setTimeout(resolve, 870));
+        // Atraso antes do próximo passo (respeitando o tempo de pulo de 800ms + pausa de 150ms)
+        await new Promise((resolve) => setTimeout(resolve, 950));
         await get().moveActiveTeam(stepsLeft - 1);
       },
 
@@ -763,8 +763,8 @@ export const useGameStore = create<GameState>()(
 
         set({ teams: updatedTeams });
 
-        // Atraso de 700ms por casa (tempo de pulo de 600ms + pausa de 100ms no retorno)
-        await new Promise((resolve) => setTimeout(resolve, 700));
+        // Atraso de 600ms por casa (tempo de pulo de 500ms + pausa de 100ms no retorno)
+        await new Promise((resolve) => setTimeout(resolve, 600));
 
         // Recursão
         await get().animateReturnToOrigin(targetPosition);

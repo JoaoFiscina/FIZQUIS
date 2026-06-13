@@ -88,7 +88,7 @@ export const Board: React.FC = () => {
     if (targetCell) {
       const cx = targetCell.position.x * 10;
       const cy = targetCell.position.y * 10;
-      const zoom = 1.80;
+      const zoom = phase === "revealing_cell" ? 1.50 : 1.38;
       const maxOffset = 500 * (1 - 1 / zoom);
       currentZoom = zoom;
       currentTx = Math.max(-maxOffset, Math.min(maxOffset, 500 - cx));
@@ -203,8 +203,8 @@ export const Board: React.FC = () => {
             <path
               d={pathD}
               fill="none"
-              stroke="rgba(0, 0, 0, 0.04)"
-              strokeWidth={52}
+              stroke="rgba(0, 0, 0, 0.05)"
+              strokeWidth={60}
               strokeLinecap="round"
             />
             {/* Border */}
@@ -212,7 +212,7 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke={borderColor}
-              strokeWidth={44}
+              strokeWidth={52}
               strokeLinecap="round"
             />
             {/* Road body */}
@@ -220,7 +220,7 @@ export const Board: React.FC = () => {
               d={pathD}
               fill="none"
               stroke={roadColor}
-              strokeWidth={36}
+              strokeWidth={44}
               strokeLinecap="round"
             />
           </g>
@@ -229,9 +229,7 @@ export const Board: React.FC = () => {
     });
 
     return lines;
-  };
-
-const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
+  };const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
   if (isStart) return "url(#grad-start)";
   if (isFinal) return "url(#grad-final)";
   if (cell.specialEffect === "curinga") return "url(#grad-curinga)";
@@ -239,6 +237,33 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
   if (cell.area) return `url(#grad-${cell.area})`;
   return "url(#grad-start)";
 };
+
+  // Helper to calculate cell path angle
+  const getCellAngle = (cell: any, board: any[]) => {
+    const x = cell.position.x * 10;
+    const y = cell.position.y * 10;
+
+    let nextCell = cell.next && cell.next.length > 0 ? board.find((c) => c.id === cell.next[0]) : null;
+    let prevCell = board.find((c) => c.next && c.next.includes(cell.id));
+
+    let dx = 0;
+    let dy = 0;
+
+    if (prevCell && nextCell) {
+      dx = (nextCell.position.x * 10) - (prevCell.position.x * 10);
+      dy = (nextCell.position.y * 10) - (prevCell.position.y * 10);
+    } else if (nextCell) {
+      dx = (nextCell.position.x * 10) - x;
+      dy = (nextCell.position.y * 10) - y;
+    } else if (prevCell) {
+      dx = x - (prevCell.position.x * 10);
+      dy = y - (prevCell.position.y * 10);
+    } else {
+      return 0;
+    }
+
+    return (Math.atan2(dy, dx) * 180) / Math.PI;
+  };
 
   // Render board cells
   const renderCells = () => {
@@ -265,13 +290,15 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
       else if (cell.area) color = areaColors[cell.area];
 
       const isSpecial = !!cell.specialEffect;
-      const r = isStart || isFinal ? 24 : (isSpecial ? 20 : 16);
+
 
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
       const cellTeamsKey = teamsOnCell.map((t) => t.id).join("_");
 
       const isFinalCell = phase === "revealing_cell" && cell.id === activeTeam.position;
       const isLandedCell = selectedCell && selectedCell.id === cell.id && (phase === "moving" || phase === "revealing_cell");
+
+      const angle = getCellAngle(cell, board);
 
       return (
         <g 
@@ -280,7 +307,8 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
             isSelectable ? "cursor-pointer hover:scale-110" : "hover:scale-[1.05]"
           }`}
           style={{
-            transformOrigin: `${x}px ${y}px`,
+            transform: `translate(${x}px, ${y}px) rotate(${angle}deg)`,
+            transformOrigin: "0px 0px",
           } as React.CSSProperties}
           onClick={() => {
             if (isSelectable) {
@@ -290,64 +318,128 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
         >
           {/* Landing highlight pulse */}
           {isLandedCell && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r}
-              fill="none"
-              stroke={color}
-              className="pointer-events-none"
-            >
-              <animate attributeName="r" values={`${r};${r + 12}`} dur="1.2s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
-              <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
-            </circle>
+            isStart || isFinal ? (
+              <circle
+                cx={0}
+                cy={0}
+                r={24}
+                fill="none"
+                stroke={color}
+                className="pointer-events-none"
+              >
+                <animate attributeName="r" values="24;36" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
+              </circle>
+            ) : (
+              <rect
+                x={-29}
+                y={-20}
+                width={58}
+                height={40}
+                rx={10}
+                fill="none"
+                stroke={color}
+                className="pointer-events-none"
+              >
+                <animate attributeName="width" values="58;74" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="height" values="40;56" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="x" values="-29;-37" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="y" values="-20;-28" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
+                <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
+              </rect>
+            )
           )}
+
           {/* Origin cell highlight */}
           {isMoving && cell.id === originPosition && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r + 4}
-              fill="none"
-              stroke="#6366f1"
-              strokeWidth={2.2}
-              opacity={0.8}
-              className="animate-origin-highlight pointer-events-none"
-              style={{ transformOrigin: `${x}px ${y}px` } as React.CSSProperties}
-            />
+            isStart || isFinal ? (
+              <circle
+                cx={0}
+                cy={0}
+                r={28}
+                fill="none"
+                stroke="#6366f1"
+                strokeWidth={2.2}
+                opacity={0.8}
+                className="animate-origin-highlight pointer-events-none"
+              />
+            ) : (
+              <rect
+                x={-33}
+                y={-24}
+                width={66}
+                height={48}
+                rx={14}
+                fill="none"
+                stroke="#6366f1"
+                strokeWidth={2.2}
+                opacity={0.8}
+                className="animate-origin-highlight pointer-events-none"
+              />
+            )
           )}
 
           {/* Selectable glow - soft drop shadow, no ring */}
           {isSelectable && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r + 5}
-              fill="none"
-              stroke="#ec4899"
-              strokeWidth={2.5}
-              opacity={0.7}
-              className="animate-gentle-pulse pointer-events-none"
-            />
+            isStart || isFinal ? (
+              <circle
+                cx={0}
+                cy={0}
+                r={29}
+                fill="none"
+                stroke="#ec4899"
+                strokeWidth={2.5}
+                opacity={0.7}
+                className="animate-gentle-pulse pointer-events-none"
+              />
+            ) : (
+              <rect
+                x={-33}
+                y={-24}
+                width={66}
+                height={48}
+                rx={14}
+                fill="none"
+                stroke="#ec4899"
+                strokeWidth={2.5}
+                opacity={0.7}
+                className="animate-gentle-pulse pointer-events-none"
+              />
+            )
           )}
 
           {/* 3D shadow beneath cell */}
-          <ellipse
-            cx={x}
-            cy={y + 3.5}
-            rx={r}
-            ry={r * 0.82}
-            fill="rgba(0, 0, 0, 0.12)"
-            className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
-          />
+          {isStart || isFinal ? (
+            <ellipse
+              cx={0}
+              cy={3.5}
+              rx={24}
+              ry={20.4}
+              fill="rgba(0, 0, 0, 0.12)"
+              className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
+            />
+          ) : (
+            <rect
+              x={-29}
+              y={-16.5}
+              width={58}
+              height={40}
+              rx={10}
+              fill="rgba(0, 0, 0, 0.12)"
+              className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
+            />
+          )}
 
           {/* Special cell outer gold glow ring */}
           {isSpecial && !isSelectable && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r + 3}
+            <rect
+              x={-32}
+              y={-23}
+              width={64}
+              height={46}
+              rx={13}
               fill="none"
               stroke="url(#grad-gold-border)"
               strokeWidth={1.5}
@@ -356,43 +448,82 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
             />
           )}
 
-          {/* Main cell circle */}
-          <circle
-            key={`circle-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
-            cx={x}
-            cy={y}
-            r={r}
-            fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
-            stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
-            strokeWidth={isSpecial ? 3.5 : 3.0}
-            className={`transition-all duration-300 ${
-              isFinalCell 
-                ? "animate-final-cell-highlight" 
-                : (landedCells[cell.id] ? "animate-cell-land" : "")
-            }`}
-            style={{
-              "--cell-color": color,
-              "--cell-x": `${x}px`,
-              "--cell-y": `${y}px`,
-              "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 700)}ms`
-            } as React.CSSProperties}
-          />
+          {/* Main cell circle or rect */}
+          {isStart || isFinal ? (
+            <circle
+              key={`circle-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
+              cx={0}
+              cy={0}
+              r={24}
+              fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
+              stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
+              strokeWidth={isSpecial ? 3.5 : 3.0}
+              className={`transition-all duration-300 ${
+                isFinalCell 
+                  ? "animate-final-cell-highlight" 
+                  : (landedCells[cell.id] ? "animate-cell-land" : "")
+              }`}
+              style={{
+                "--cell-color": color,
+                "--cell-x": "0px",
+                "--cell-y": "0px",
+                "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 800)}ms`
+              } as React.CSSProperties}
+            />
+          ) : (
+            <rect
+              key={`rect-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
+              x={-29}
+              y={-20}
+              width={58}
+              height={40}
+              rx={10}
+              fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
+              stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
+              strokeWidth={isSpecial ? 3.5 : 3.0}
+              className={`transition-all duration-300 ${
+                isFinalCell 
+                  ? "animate-final-cell-highlight" 
+                  : (landedCells[cell.id] ? "animate-cell-land" : "")
+              }`}
+              style={{
+                "--cell-color": color,
+                "--cell-x": "0px",
+                "--cell-y": "0px",
+                "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 800)}ms`
+              } as React.CSSProperties}
+            />
+          )}
 
           {/* Glossy highlight */}
-          <circle
-            cx={x}
-            cy={y}
-            r={r}
-            fill="url(#cellGlossy)"
-            className="pointer-events-none"
-          />
+          {isStart || isFinal ? (
+            <circle
+              cx={0}
+              cy={0}
+              r={24}
+              fill="url(#cellGlossy)"
+              className="pointer-events-none"
+            />
+          ) : (
+            <rect
+              x={-29}
+              y={-20}
+              width={58}
+              height={40}
+              rx={10}
+              fill="url(#cellGlossy)"
+              className="pointer-events-none"
+            />
+          )}
 
           {/* Special cell subtle inner ring */}
           {isSpecial && !isSelectable && (
-            <circle
-              cx={x}
-              cy={y}
-              r={r - 3}
+            <rect
+              x={-26}
+              y={-17}
+              width={52}
+              height={34}
+              rx={7}
               fill="none"
               stroke="rgba(255,255,255,0.4)"
               strokeWidth={1}
@@ -403,14 +534,14 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
 
           {/* Small gold star seal badge for special cells */}
           {isSpecial && !isSelectable && (
-            <g transform={`translate(${x + r - 3}, ${y - r + 3})`} className="pointer-events-none">
+            <g transform="translate(26, -17)" className="pointer-events-none">
               <circle r={5.5} fill="#D4AF37" stroke="#FFFFFF" strokeWidth={1} />
               <polygon points="0,-2.5 0.7,-0.7 2.5,-0.7 1,0.4 1.5,2.2 0,1.1 -1.5,2.2 -1,0.4 -2.5,-0.7 -0.7,-0.7" fill="#FFFFFF" />
             </g>
           )}
 
-          {/* Icon or ID */}
-          <g transform={`translate(${x}, ${y})`}>
+          {/* Icon or ID - rotation cancelled to keep text/icon upright */}
+          <g transform={`rotate(${-angle})`} className="pointer-events-none">
             {cell.specialEffect || (cell.type === "normal" && cell.area) ? (
               <g transform={`translate(-${(isSpecial ? 20 : 14) / 2}, -${(isSpecial ? 20 : 14) / 2})`}>
                 {getEffectIcon(cell.specialEffect, cell.area, isSpecial ? 20 : 14)}
@@ -452,7 +583,7 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
 
   // Render pawns as 3D game pieces
   const renderPawns = () => {
-    const hopDuration = isReturning ? 600 : 750;
+    const hopDuration = isReturning ? 500 : 800;
 
     return board.map((cell) => {
       const teamsOnCell = teams.filter((t) => t.position === cell.id);
@@ -507,48 +638,82 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
 
                       {/* Pawn body wrapper (handles hop vertical translate & scale) */}
                       <g className="pawn-body-anim">
-                        {/* Outer white ring */}
-                        <circle
+                        {/* 1. Base (flat ring on board) */}
+                        <ellipse
                           cx={0}
-                          cy={0}
-                          r={14}
+                          cy={9}
+                          rx={12}
+                          ry={4.5}
                           fill="#FFFFFF"
                           className="pointer-events-none"
                         />
-                        
-                        {/* Main color circle */}
-                        <circle
+                        <ellipse
                           cx={0}
-                          cy={0}
-                          r={12.5}
+                          cy={9}
+                          rx={10.5}
+                          ry={3.2}
                           fill={team.color}
                           className="pointer-events-none"
                         />
 
-                        {/* Glossy overlay */}
+                        {/* 2. Body Cone */}
+                        <polygon
+                          points="-10,9 -5,-2 5,-2 10,9"
+                          fill="#FFFFFF"
+                          className="pointer-events-none"
+                        />
+                        <polygon
+                          points="-8.5,8.5 -4,-1.5 4,-1.5 8.5,8.5"
+                          fill={team.color}
+                          className="pointer-events-none"
+                        />
+
+                        {/* Glossy overlay on cone */}
+                        <polygon
+                          points="-8.5,8.5 -4,-1.5 4,-1.5 8.5,8.5"
+                          fill="url(#pawnGlossy)"
+                          opacity={0.35}
+                          className="pointer-events-none"
+                        />
+
+                        {/* 3. Head Sphere */}
                         <circle
                           cx={0}
-                          cy={0}
-                          r={12.5}
+                          cy={-5}
+                          r={9}
+                          fill="#FFFFFF"
+                          className="pointer-events-none"
+                        />
+                        <circle
+                          cx={0}
+                          cy={-5}
+                          r={7.5}
+                          fill={team.color}
+                          className="pointer-events-none"
+                        />
+
+                        {/* Specular highlights for 3D sphere look */}
+                        <circle
+                          cx={0}
+                          cy={-5}
+                          r={7.5}
                           fill="url(#pawnGlossy)"
                           className="pointer-events-none"
                         />
-
-                        {/* 3D sphere specular highlight */}
                         <ellipse
-                          cx={-4}
-                          cy={-4}
-                          rx={4}
-                          ry={2.5}
+                          cx={-2.5}
+                          cy={-7.5}
+                          rx={2.5}
+                          ry={1.5}
                           fill="#ffffff"
-                          opacity={0.45}
-                          transform="rotate(-30, -4, -4)"
+                          opacity={0.6}
+                          transform="rotate(-30, -2.5, -7.5)"
                           className="pointer-events-none"
                         />
 
-                        {/* Pawn icon */}
-                        <g transform="translate(-7, -7)" className="text-white pointer-events-none">
-                          <PawnIcon type={team.pawn} size={14} />
+                        {/* Pawn icon on the body cone */}
+                        <g transform="translate(-6, -2.5)" className="text-white pointer-events-none">
+                          <PawnIcon type={team.pawn} size={12} />
                         </g>
                       </g>
                     </g>
@@ -581,41 +746,41 @@ const getCellFill = (cell: any, isStart: boolean, isFinal: boolean) => {
         </g>
         
         {/* Hospital wings decorative background badges */}
-        <g id="hospital-wings" className="pointer-events-none select-none" opacity={0.10} fill="#4338ca">
+        <g id="hospital-wings" className="pointer-events-none select-none animate-fade-in" opacity={0.85}>
           {/* Pronto-Socorro near bottom trail */}
           <g transform="translate(500, 930)">
-            <rect x="-100" y="-18" width="200" height="36" rx="18" fill="#4338ca" opacity={0.12} />
-            <text textAnchor="middle" y="5" fontSize="13" fontWeight="950" letterSpacing="2.5">PRONTO-SOCORRO</text>
+            <rect x="-90" y="-15" width="180" height="30" rx="12" fill="#F58C3D" />
+            <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🚨 PRONTO-SOCORRO</text>
           </g>
 
           {/* Ambulatório near long path */}
           <g transform="translate(500, 810)">
-            <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#4338ca" opacity={0.12} />
-            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">AMBULATÓRIO GERAL</text>
+            <rect x="-95" y="-15" width="190" height="30" rx="12" fill="#4F8EF7" />
+            <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🩺 AMBULATÓRIO GERAL</text>
           </g>
 
           {/* Centro Cirúrgico near middle trail */}
           <g transform="translate(480, 600)">
-            <rect x="-90" y="-16" width="180" height="32" rx="16" fill="#4338ca" opacity={0.12} />
-            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">CENTRO CIRÚRGICO</text>
+            <rect x="-90" y="-15" width="180" height="30" rx="12" fill="#F25C5C" />
+            <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">✂️ CENTRO CIRÚRGICO</text>
           </g>
 
           {/* UTI near shortcut superior */}
           <g transform="translate(740, 440)">
-            <rect x="-65" y="-16" width="130" height="32" rx="16" fill="#4338ca" opacity={0.12} />
-            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">U.T.I. CORONÁRIA</text>
+            <rect x="-80" y="-15" width="160" height="30" rx="12" fill="#A56CF5" />
+            <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">💖 U.T.I. CORONÁRIA</text>
           </g>
 
           {/* Enfermaria near curvature */}
           <g transform="translate(820, 200)">
-            <rect x="-80" y="-16" width="160" height="32" rx="16" fill="#4338ca" opacity={0.12} />
-            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">ALA DE INTERNAÇÃO</text>
+            <rect x="-85" y="-15" width="170" height="30" rx="12" fill="#34C78A" />
+            <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🛌 ALA DE INTERNAÇÃO</text>
           </g>
 
           {/* Diretoria near final */}
           <g transform="translate(300, 160)">
-            <rect x="-85" y="-16" width="170" height="32" rx="16" fill="#4338ca" opacity={0.12} />
-            <text textAnchor="middle" y="4.5" fontSize="11" fontWeight="950" letterSpacing="2">DIRETORIA DO HOSPITAL</text>
+            <rect x="-95" y="-15" width="190" height="30" rx="12" fill="#F5C042" />
+            <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🏆 DIRETORIA DO HOSPITAL</text>
           </g>
         </g>
       </>

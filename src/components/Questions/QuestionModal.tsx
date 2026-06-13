@@ -21,7 +21,7 @@ export const QuestionModal: React.FC = () => {
   const [selectedOption, setSelectedOption] = useState<"A" | "B" | "C" | "D" | null>(null);
   const [showTargetSelect, setShowTargetSelect] = useState(false);
 
-  if (!activeQuestion || !selectedCell) return null;
+  if (!activeQuestion || !selectedCell || (phase !== "answering" && phase !== "resolving")) return null;
 
   const activeTeam = teams[currentTeamIndex];
   const isAnswering = phase === "answering";
