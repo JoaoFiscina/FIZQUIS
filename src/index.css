@@ -82,17 +82,17 @@
   0% {
     transform: translateY(0) scale(1, 1);
   }
-  12% {
-    transform: translateY(2px) scale(1.16, 0.80); /* Squash down before jump */
+  15% {
+    transform: translateY(4px) scale(1.12, 0.88); /* Squash down before jump */
   }
-  42% {
-    transform: translateY(-34px) scale(0.86, 1.20); /* Stretch upwards in mid-air */
+  50% {
+    transform: translateY(-34px) scale(1.10, 1.10); /* Rise vertical offset & uniform scale in air */
   }
-  74% {
-    transform: translateY(0) scale(1.18, 0.82); /* Landing impact squash */
+  80% {
+    transform: translateY(0) scale(0.96, 0.96); /* Touchdown quick squash */
   }
-  88% {
-    transform: translateY(-4px) scale(0.95, 1.05); /* Soft bounce rebound */
+  90% {
+    transform: translateY(-2px) scale(1.02, 1.02); /* Soft rebound */
   }
   100% {
     transform: translateY(0) scale(1, 1);
@@ -104,20 +104,20 @@
     transform: scale(1);
     opacity: 0.25;
   }
-  12% {
+  15% {
     transform: scale(1.15);
     opacity: 0.30;
   }
-  42% {
-    transform: scale(0.35); /* Shrink at peak height */
-    opacity: 0.03;
+  50% {
+    transform: scale(0.40); /* Shrink when pawn rises */
+    opacity: 0.05;
   }
-  74% {
-    transform: scale(1.28); /* Expand on landing */
-    opacity: 0.40;
+  80% {
+    transform: scale(1.20); /* Expand on touchdown */
+    opacity: 0.35;
   }
-  88% {
-    transform: scale(0.92);
+  90% {
+    transform: scale(0.95);
     opacity: 0.20;
   }
   100% {
@@ -127,13 +127,13 @@
 }
 
 .animate-pawn-hop .pawn-body-anim {
-  transform-origin: 0px 0px;
-  animation: pawnHop var(--hop-duration, 800ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: center bottom;
+  animation: pawnHop var(--hop-duration, 850ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .animate-pawn-hop .pawn-shadow-anim {
-  transform-origin: 0px 14px;
-  animation: shadowHop var(--hop-duration, 800ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: center center;
+  animation: shadowHop var(--hop-duration, 850ms) cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Fade in */
@@ -174,22 +174,22 @@
 
 /* Spring transition for pawn movement with variable duration */
 .transition-pawn-hop {
-  transition: transform var(--hop-duration, 800ms) cubic-bezier(0.25, 1, 0.5, 1);
+  transition: transform var(--hop-duration, 850ms) cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Cell land animation */
 @keyframes cellLand {
   0% {
     transform: scale(1);
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.12));
   }
-  30% {
-    transform: scale(1.08);
-    filter: drop-shadow(0 8px 16px var(--cell-color, #ec4899)) brightness(1.08);
+  45% {
+    transform: scale(1.08); /* Reage suavemente: scale 1 -> 1.08 -> 0.96 -> 1 */
+    filter: drop-shadow(0 6px 12px var(--cell-color, #ec4899)) brightness(1.06);
   }
-  65% {
+  75% {
     transform: scale(0.96);
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.08));
   }
   100% {
     transform: scale(1);
@@ -197,9 +197,9 @@
   }
 }
 .animate-cell-land {
-  transform-origin: var(--cell-x, 0px) var(--cell-y, 0px);
-  animation: cellLand 350ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  animation-delay: var(--hop-delay, 750ms);
+  transform-origin: center center;
+  animation: cellLand 400ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: var(--hop-delay, 850ms);
 }
 
 /* ===== VOLUMETRIC 3D BUTTONS & CARDS ===== */
