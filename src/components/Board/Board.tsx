@@ -302,6 +302,14 @@ export const Board: React.FC = () => {
 
       const angle = getCellAngle(cell, board);
 
+      const cellW = isStart ? 80 : (isFinal ? 84 : 74);
+      const cellH = isStart ? 60 : (isFinal ? 64 : 50);
+      const cellX = -cellW / 2;
+      const cellY = -cellH / 2;
+      const cellRx = isStart ? 16 : (isFinal ? 20 : 12);
+      const cellStrokeWidth = isFinal ? 4.5 : (isSpecial ? 4.0 : 3.5);
+      const cellStroke = isFinal || isSpecial ? "url(#grad-gold-border)" : "#FFFFFF";
+
       return (
         <g 
           key={`cell-${cell.id}`} 
@@ -320,226 +328,139 @@ export const Board: React.FC = () => {
         >
           {/* Landing highlight pulse */}
           {isLandedCell && (
-            isStart || isFinal ? (
-              <circle
-                cx={0}
-                cy={0}
-                r={24}
-                fill="none"
-                stroke={color}
-                className="pointer-events-none"
-              >
-                <animate attributeName="r" values="24;36" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
-              </circle>
-            ) : (
-              <rect
-                x={-29}
-                y={-20}
-                width={58}
-                height={40}
-                rx={10}
-                fill="none"
-                stroke={color}
-                className="pointer-events-none"
-              >
-                <animate attributeName="width" values="58;74" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="height" values="40;56" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="x" values="-29;-37" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="y" values="-20;-28" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
-                <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
-              </rect>
-            )
+            <rect
+              x={cellX}
+              y={cellY}
+              width={cellW}
+              height={cellH}
+              rx={cellRx}
+              fill="none"
+              stroke={color}
+              className="pointer-events-none"
+            >
+              <animate attributeName="width" values={`${cellW};${cellW + 16}`} dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="height" values={`${cellH};${cellH + 16}`} dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="x" values={`${cellX};${cellX - 8}`} dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="y" values={`${cellY};${cellY - 8}`} dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.8;0" dur="1.2s" repeatCount="indefinite" />
+              <animate attributeName="stroke-width" values="5;1" dur="1.2s" repeatCount="indefinite" />
+            </rect>
           )}
 
           {/* Origin cell highlight */}
           {isMoving && cell.id === originPosition && (
-            isStart || isFinal ? (
-              <circle
-                cx={0}
-                cy={0}
-                r={28}
-                fill="none"
-                stroke="#6366f1"
-                strokeWidth={2.2}
-                opacity={0.8}
-                className="animate-origin-highlight pointer-events-none"
-              />
-            ) : (
-              <rect
-                x={-33}
-                y={-24}
-                width={66}
-                height={48}
-                rx={14}
-                fill="none"
-                stroke="#6366f1"
-                strokeWidth={2.2}
-                opacity={0.8}
-                className="animate-origin-highlight pointer-events-none"
-              />
-            )
+            <rect
+              x={cellX - 4}
+              y={cellY - 4}
+              width={cellW + 8}
+              height={cellH + 8}
+              rx={cellRx + 4}
+              fill="none"
+              stroke="#6366f1"
+              strokeWidth={2.2}
+              opacity={0.8}
+              className="animate-origin-highlight pointer-events-none"
+            />
           )}
 
           {/* Selectable glow - soft drop shadow, no ring */}
           {isSelectable && (
-            isStart || isFinal ? (
-              <circle
-                cx={0}
-                cy={0}
-                r={29}
-                fill="none"
-                stroke="#ec4899"
-                strokeWidth={2.5}
-                opacity={0.7}
-                className="animate-gentle-pulse pointer-events-none"
-              />
-            ) : (
-              <rect
-                x={-33}
-                y={-24}
-                width={66}
-                height={48}
-                rx={14}
-                fill="none"
-                stroke="#ec4899"
-                strokeWidth={2.5}
-                opacity={0.7}
-                className="animate-gentle-pulse pointer-events-none"
-              />
-            )
+            <rect
+              x={cellX - 4}
+              y={cellY - 4}
+              width={cellW + 8}
+              height={cellH + 8}
+              rx={cellRx + 4}
+              fill="none"
+              stroke="#ec4899"
+              strokeWidth={2.5}
+              opacity={0.7}
+              className="animate-gentle-pulse pointer-events-none"
+            />
           )}
 
           {/* 3D shadow beneath cell */}
-          {isStart || isFinal ? (
-            <ellipse
-              cx={0}
-              cy={3.5}
-              rx={24}
-              ry={20.4}
-              fill="rgba(0, 0, 0, 0.12)"
-              className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
-            />
-          ) : (
-            <rect
-              x={-29}
-              y={-16.5}
-              width={58}
-              height={40}
-              rx={10}
-              fill="rgba(0, 0, 0, 0.12)"
-              className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
-            />
-          )}
+          <rect
+            x={cellX}
+            y={cellY + 3.5}
+            width={cellW}
+            height={cellH}
+            rx={cellRx}
+            fill="rgba(0, 0, 0, 0.15)"
+            className="pointer-events-none transition-transform duration-200 group-hover:translate-y-[1px]"
+          />
 
           {/* Special cell outer gold glow ring */}
           {isSpecial && !isSelectable && (
             <rect
-              x={-32}
-              y={-23}
-              width={64}
-              height={46}
-              rx={13}
+              x={cellX - 3}
+              y={cellY - 3}
+              width={cellW + 6}
+              height={cellH + 6}
+              rx={cellRx + 3}
               fill="none"
               stroke="url(#grad-gold-border)"
-              strokeWidth={1.5}
-              opacity={0.7}
+              strokeWidth={1.8}
+              opacity={0.8}
               className="pointer-events-none animate-gentle-pulse"
             />
           )}
 
-          {/* Main cell circle or rect */}
-          {isStart || isFinal ? (
-            <circle
-              key={`circle-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
-              cx={0}
-              cy={0}
-              r={24}
-              fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
-              stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
-              strokeWidth={isSpecial ? 3.5 : 3.0}
-              className={`transition-all duration-300 ${
-                isFinalCell 
-                  ? "animate-final-cell-highlight" 
-                  : (landedCells[cell.id] ? "animate-cell-land" : "")
-              }`}
-              style={{
-                "--cell-color": color,
-                "--cell-x": "0px",
-                "--cell-y": "0px",
-                "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 800)}ms`
-              } as React.CSSProperties}
-            />
-          ) : (
-            <rect
-              key={`rect-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
-              x={-29}
-              y={-20}
-              width={58}
-              height={40}
-              rx={10}
-              fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
-              stroke={isSpecial ? "url(#grad-gold-border)" : "#FFFFFF"}
-              strokeWidth={isSpecial ? 3.5 : 3.0}
-              className={`transition-all duration-300 ${
-                isFinalCell 
-                  ? "animate-final-cell-highlight" 
-                  : (landedCells[cell.id] ? "animate-cell-land" : "")
-              }`}
-              style={{
-                "--cell-color": color,
-                "--cell-x": "0px",
-                "--cell-y": "0px",
-                "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 800)}ms`
-              } as React.CSSProperties}
-            />
-          )}
+          {/* Main cell block */}
+          <rect
+            key={`rect-${cell.id}-${cellTeamsKey}-${landedCells[cell.id]?.key || "idle"}`}
+            x={cellX}
+            y={cellY}
+            width={cellW}
+            height={cellH}
+            rx={cellRx}
+            fill={isSelectable ? "url(#grad-curinga)" : getCellFill(cell, isStart, isFinal)}
+            stroke={cellStroke}
+            strokeWidth={cellStrokeWidth}
+            className={`transition-all duration-300 ${
+              isFinalCell 
+                ? "animate-final-cell-highlight" 
+                : (landedCells[cell.id] ? "animate-cell-land" : "")
+            }`}
+            style={{
+              "--cell-color": color,
+              "--cell-x": "0px",
+              "--cell-y": "0px",
+              "--hop-duration": `${landedCells[cell.id]?.delay || (isReturning ? 500 : 800)}ms`
+            } as React.CSSProperties}
+          />
 
           {/* Glossy highlight */}
-          {isStart || isFinal ? (
-            <circle
-              cx={0}
-              cy={0}
-              r={24}
-              fill="url(#cellGlossy)"
-              className="pointer-events-none"
-            />
-          ) : (
-            <rect
-              x={-29}
-              y={-20}
-              width={58}
-              height={40}
-              rx={10}
-              fill="url(#cellGlossy)"
-              className="pointer-events-none"
-            />
-          )}
+          <rect
+            x={cellX}
+            y={cellY}
+            width={cellW}
+            height={cellH}
+            rx={cellRx}
+            fill="url(#cellGlossy)"
+            className="pointer-events-none"
+          />
 
-          {/* Special cell subtle inner ring */}
+          {/* Special cell subtle inner ring and stamp */}
           {isSpecial && !isSelectable && (
-            <rect
-              x={-26}
-              y={-17}
-              width={52}
-              height={34}
-              rx={7}
-              fill="none"
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth={1}
-              strokeDasharray="3 3"
-              className="pointer-events-none"
-            />
-          )}
-
-          {/* Small gold star seal badge for special cells */}
-          {isSpecial && !isSelectable && (
-            <g transform="translate(26, -17)" className="pointer-events-none">
-              <circle r={5.5} fill="#D4AF37" stroke="#FFFFFF" strokeWidth={1} />
-              <polygon points="0,-2.5 0.7,-0.7 2.5,-0.7 1,0.4 1.5,2.2 0,1.1 -1.5,2.2 -1,0.4 -2.5,-0.7 -0.7,-0.7" fill="#FFFFFF" />
-            </g>
+            <>
+              <rect
+                x={cellX + 3}
+                y={cellY + 3}
+                width={cellW - 6}
+                height={cellH - 6}
+                rx={cellRx - 3}
+                fill="none"
+                stroke="rgba(255,255,255,0.35)"
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                className="pointer-events-none"
+              />
+              <g transform={`translate(${cellW/2 - 4}, ${-cellH/2 + 4})`} className="pointer-events-none">
+                <circle r={5.5} fill="#D4AF37" stroke="#FFFFFF" strokeWidth={1} />
+                <polygon points="0,-2.5 0.7,-0.7 2.5,-0.7 1,0.4 1.5,2.2 0,1.1 -1.5,2.2 -1,0.4 -2.5,-0.7 -0.7,-0.7" fill="#FFFFFF" />
+              </g>
+            </>
           )}
 
           {/* Icon or ID - rotation cancelled to keep text/icon upright */}
@@ -563,17 +484,41 @@ export const Board: React.FC = () => {
               </text>
             )}
 
-            {/* Start/End text */}
-            {(isStart || isFinal) && (
+            {/* Start text */}
+            {isStart && (
               <text
                 x={0}
-                y={3}
+                y={3.5}
                 textAnchor="middle"
                 fill="white"
-                className="text-[8px] font-black tracking-wider uppercase select-none pointer-events-none"
+                className="text-[9px] font-black tracking-wider uppercase select-none pointer-events-none"
               >
-                {isStart ? "Início" : "🏆"}
+                INÍCIO
               </text>
+            )}
+
+            {/* Finish text */}
+            {isFinal && (
+              <g transform="translate(0, -2)">
+                <text
+                  x={0}
+                  y={-2}
+                  textAnchor="middle"
+                  fill="white"
+                  className="text-[12px] select-none pointer-events-none"
+                >
+                  🏆
+                </text>
+                <text
+                  x={0}
+                  y={10}
+                  textAnchor="middle"
+                  fill="white"
+                  className="text-[8px] font-black tracking-wider uppercase select-none pointer-events-none"
+                >
+                  FIM
+                </text>
+              </g>
             )}
           </g>
 
@@ -736,7 +681,7 @@ export const Board: React.FC = () => {
     return (
       <>
         {/* Scattered medical emojis as fun decoration */}
-        <g id="decorations" className="pointer-events-none select-none animate-fade-in" opacity={0.13}>
+        <g id="decorations" className="pointer-events-none select-none animate-fade-in" opacity={0.15}>
           <text x="150" y="450" fontSize="28">🩺</text>
           <text x="850" y="500" fontSize="24">💉</text>
           <text x="500" y="150" fontSize="22">🏥</text>
@@ -748,41 +693,102 @@ export const Board: React.FC = () => {
         </g>
         
         {/* Hospital wings decorative background badges */}
-        <g id="hospital-wings" className="pointer-events-none select-none animate-fade-in" opacity={0.85}>
+        <g id="hospital-wings" className="pointer-events-none select-none animate-fade-in" opacity={0.92}>
           {/* Pronto-Socorro near bottom trail */}
           <g transform="translate(500, 930)">
-            <rect x="-90" y="-15" width="180" height="30" rx="12" fill="#F58C3D" />
+            {/* 3D bottom shadow */}
+            <rect x="-92" y="-12" width="184" height="30" rx="14" fill="rgba(0, 0, 0, 0.12)" />
+            {/* Main badge */}
+            <rect x="-90" y="-15" width="180" height="30" rx="12" fill="#F58C3D" stroke="#FFFFFF" strokeWidth={2.5} />
             <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🚨 PRONTO-SOCORRO</text>
+            {/* Cute building Standee */}
+            <g transform="translate(-112, -22)" opacity={0.95}>
+              <rect x="-14" y="-14" width="28" height="28" rx="8" fill="#F58C3D" stroke="#FFFFFF" strokeWidth={2} />
+              <rect x="-4" y="4" width="8" height="10" fill="#FFFFFF" rx="1.5" />
+              {/* Red Cross */}
+              <rect x="-1.5" y="-10" width="3" height="9" fill="#FFFFFF" />
+              <rect x="-4.5" y="-7" width="9" height="3" fill="#FFFFFF" />
+            </g>
           </g>
 
           {/* Ambulatório near long path */}
           <g transform="translate(500, 810)">
-            <rect x="-95" y="-15" width="190" height="30" rx="12" fill="#4F8EF7" />
+            {/* 3D bottom shadow */}
+            <rect x="-97" y="-12" width="194" height="30" rx="14" fill="rgba(0, 0, 0, 0.12)" />
+            {/* Main badge */}
+            <rect x="-95" y="-15" width="190" height="30" rx="12" fill="#4F8EF7" stroke="#FFFFFF" strokeWidth={2.5} />
             <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🩺 AMBULATÓRIO GERAL</text>
+            {/* Cute building Standee */}
+            <g transform="translate(-117, -22)" opacity={0.95}>
+              <rect x="-14" y="-14" width="28" height="28" rx="8" fill="#4F8EF7" stroke="#FFFFFF" strokeWidth={2} />
+              <rect x="-4" y="4" width="8" height="10" fill="#FFFFFF" rx="1.5" />
+              {/* Windows */}
+              <rect x="-7" y="-7" width="5" height="5" fill="#FFFFFF" rx="1" />
+              <rect x="2" y="-7" width="5" height="5" fill="#FFFFFF" rx="1" />
+            </g>
           </g>
 
           {/* Centro Cirúrgico near middle trail */}
           <g transform="translate(480, 600)">
-            <rect x="-90" y="-15" width="180" height="30" rx="12" fill="#F25C5C" />
+            {/* 3D bottom shadow */}
+            <rect x="-92" y="-12" width="184" height="30" rx="14" fill="rgba(0, 0, 0, 0.12)" />
+            {/* Main badge */}
+            <rect x="-90" y="-15" width="180" height="30" rx="12" fill="#F25C5C" stroke="#FFFFFF" strokeWidth={2.5} />
             <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">✂️ CENTRO CIRÚRGICO</text>
+            {/* Cute building Standee */}
+            <g transform="translate(-112, -22)" opacity={0.95}>
+              <rect x="-14" y="-14" width="28" height="28" rx="8" fill="#F25C5C" stroke="#FFFFFF" strokeWidth={2} />
+              {/* Roof dome circle */}
+              <path d="M-8,2 A8,8 0 0,1 8,2 Z" fill="#FFFFFF" />
+              <rect x="-3" y="4" width="6" height="10" fill="#FFFFFF" rx="1" />
+            </g>
           </g>
 
           {/* UTI near shortcut superior */}
           <g transform="translate(740, 440)">
-            <rect x="-80" y="-15" width="160" height="30" rx="12" fill="#A56CF5" />
+            {/* 3D bottom shadow */}
+            <rect x="-82" y="-12" width="164" height="30" rx="14" fill="rgba(0, 0, 0, 0.12)" />
+            {/* Main badge */}
+            <rect x="-80" y="-15" width="160" height="30" rx="12" fill="#A56CF5" stroke="#FFFFFF" strokeWidth={2.5} />
             <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">💖 U.T.I. CORONÁRIA</text>
+            {/* Cute building Standee */}
+            <g transform="translate(98, -22)" opacity={0.95}>
+              <rect x="-14" y="-14" width="28" height="28" rx="8" fill="#A56CF5" stroke="#FFFFFF" strokeWidth={2} />
+              {/* Pulse line drawing */}
+              <path d="M -9,-2 L -4,-2 L -2,-8 L 1,4 L 3,-4 L 5,-2 L 9,-2" fill="none" stroke="#FFFFFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+            </g>
           </g>
 
           {/* Enfermaria near curvature */}
           <g transform="translate(820, 200)">
-            <rect x="-85" y="-15" width="170" height="30" rx="12" fill="#34C78A" />
+            {/* 3D bottom shadow */}
+            <rect x="-87" y="-12" width="174" height="30" rx="14" fill="rgba(0, 0, 0, 0.12)" />
+            {/* Main badge */}
+            <rect x="-85" y="-15" width="170" height="30" rx="12" fill="#34C78A" stroke="#FFFFFF" strokeWidth={2.5} />
             <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🛌 ALA DE INTERNAÇÃO</text>
+            {/* Cute building Standee */}
+            <g transform="translate(-107, -22)" opacity={0.95}>
+              <rect x="-14" y="-14" width="28" height="28" rx="8" fill="#34C78A" stroke="#FFFFFF" strokeWidth={2} />
+              {/* Bed shape representation */}
+              <rect x="-10" y="2" width="20" height="6" fill="#FFFFFF" rx="1" />
+              <rect x="-10" y="-4" width="6" height="6" fill="#FFFFFF" rx="1" />
+              <circle cx="2" cy="-4" r="2.5" fill="#FFFFFF" />
+            </g>
           </g>
 
           {/* Diretoria near final */}
           <g transform="translate(300, 160)">
-            <rect x="-95" y="-15" width="190" height="30" rx="12" fill="#F5C042" />
+            {/* 3D bottom shadow */}
+            <rect x="-97" y="-12" width="194" height="30" rx="14" fill="rgba(0, 0, 0, 0.12)" />
+            {/* Main badge */}
+            <rect x="-95" y="-15" width="190" height="30" rx="12" fill="#F5C042" stroke="#FFFFFF" strokeWidth={2.5} />
             <text textAnchor="middle" y="4" fontSize="10" fontWeight="900" fill="#FFFFFF" letterSpacing="1">🏆 DIRETORIA DO HOSPITAL</text>
+            {/* Cute building Standee */}
+            <g transform="translate(-117, -22)" opacity={0.95}>
+              <rect x="-14" y="-14" width="28" height="28" rx="8" fill="#F5C042" stroke="#FFFFFF" strokeWidth={2} />
+              {/* Gold trophy mini silhouette */}
+              <path d="M-6,-8 L6,-8 L4,-2 C3,1 1,2 1,4 L3,4 L3,7 L-3,7 L-3,4 L-1,4 C-1,2 -3,1 -4,-2 Z" fill="#FFFFFF" />
+            </g>
           </g>
         </g>
       </>
